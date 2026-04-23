@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>for suchir, from golu</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --blush: #f2d4cc;
+    --rose: #e8b4a8;
+    --petal: #f7e8e4;
+    --lavender: #ddd0e8;
+    --sage: #c8d8c4;
+    --cream: #fdf6f0;
+    --text: #5a3e38;
+    --text-light: #8a6a64;
+    --accent: #c4826a;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  /* ─── OPENING SCREEN ─── */
+  #opening {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+    background: linear-gradient(160deg, #fdeee9 0%, #f0dded 40%, #ddd5ea 100%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  #opening::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 30% 20%, rgba(232,180,168,0.3) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 80%, rgba(200,216,196,0.25) 0%, transparent 55%);
+    pointer-events: none;
+  }
+
+  .opening-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: clamp(1.5rem, 4vw, 2.4rem);
+    line-height: 1.7;
+    color: var(--text);
+    max-width: 560px;
+    animation: fadeUp 1.6s ease both;
+  }
+
+  .opening-text em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .scroll-hint {
+    margin-top: 3rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-light);
+    animation: fadeUp 2.2s ease both, pulse 3s 2.5s ease-in-out infinite;
+  }
+
+  .scroll-arrow {
+    margin-top: 0.6rem;
+    display: block;
+    font-size: 1rem;
+    animation: bounce 2s 3s ease-in-out infinite;
+    color: var(--accent);
+  }
+
+  /* ─── LETTER SECTION ─── */
+  #letter {
+    max-width: 660px;
+    margin: 0 auto;
+    padding: 6rem 2rem 4rem;
+  }
+
+  .letter-salutation {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--accent);
+    margin-bottom: 2.5rem;
+  }
+
+  .letter-body p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.05rem, 2.5vw, 1.22rem);
+    font-weight: 300;
+    line-height: 1.85;
+    color: var(--text);
+    margin-bottom: 1.8rem;
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .letter-body p.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .signature {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.15rem;
+    color: var(--accent);
+    margin-top: 0.4rem;
+    display: block;
+  }
+
+  /* ─── FLOWER SECTION ─── */
+  #flowers {
+    padding: 5rem 2rem;
+    background: linear-gradient(180deg, var(--cream) 0%, #f5eaf5 50%, var(--cream) 100%);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .flowers-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2.5rem 3rem;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .flower-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.7rem;
+    opacity: 0;
+    transform: scale(0.7) translateY(20px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .flower-item.visible {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+
+  .flower-item:nth-child(2) { transition-delay: 0.15s; }
+  .flower-item:nth-child(3) { transition-delay: 0.3s; }
+  .flower-item:nth-child(4) { transition-delay: 0.45s; }
+  .flower-item:nth-child(5) { transition-delay: 0.6s; }
+
+  .flower-svg {
+    width: 64px;
+    height: 64px;
+    animation: sway 4s ease-in-out infinite;
+  }
+
+  .flower-item:nth-child(even) .flower-svg { animation-direction: alternate-reverse; animation-duration: 5s; }
+
+  .flower-caption {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 0.9rem;
+    color: var(--text-light);
+    max-width: 130px;
+    line-height: 1.4;
+  }
+
+  /* ─── COMFORT SECTION ─── */
+  #comfort {
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 5rem 2rem;
+  }
+
+  .comfort-heading {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.6rem, 4vw, 2.1rem);
+    font-weight: 300;
+    font-style: italic;
+    color: var(--text);
+    margin-bottom: 2.5rem;
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .comfort-heading.visible { opacity: 1; transform: translateY(0); }
+
+  .comfort-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+
+  .comfort-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1rem, 2.5vw, 1.15rem);
+    font-weight: 300;
+    color: var(--text);
+    opacity: 0;
+    transform: translateX(-16px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .comfort-list li.visible { opacity: 1; transform: translateX(0); }
+  .comfort-list li:nth-child(2) { transition-delay: 0.12s; }
+  .comfort-list li:nth-child(3) { transition-delay: 0.24s; }
+  .comfort-list li:nth-child(4) { transition-delay: 0.36s; }
+
+  .comfort-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--rose);
+    margin-top: 0.55rem;
+    flex-shrink: 0;
+  }
+
+  /* ─── FINAL SECTION ─── */
+  #finale {
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4rem 2rem;
+    background: linear-gradient(160deg, #fdf0ec 0%, #ede0f0 50%, #d8e8d4 100%);
+    position: relative;
+  }
+
+  .finale-line1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.8rem, 5vw, 2.8rem);
+    font-weight: 300;
+    color: var(--text);
+    margin-bottom: 1.2rem;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 1s ease, transform 1s ease;
+  }
+
+  .finale-line2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    font-weight: 300;
+    font-style: italic;
+    color: var(--text-light);
+    margin-bottom: 2rem;
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 1s ease 0.25s, transform 1s ease 0.25s;
+  }
+
+  .finale-sig {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.4rem;
+    color: var(--accent);
+    opacity: 0;
+    transition: opacity 1s ease 0.5s;
+  }
+
+  .finale-line1.visible, .finale-line2.visible, .finale-sig.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .heart {
+    margin-top: 3rem;
+    opacity: 0;
+    transition: opacity 1s ease 0.8s;
+    animation: heartbeat 2.2s 2s ease-in-out infinite;
+  }
+
+  .heart.visible { opacity: 1; }
+
+  /* ─── DIVIDER ─── */
+  .section-divider {
+    width: 60px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--rose), transparent);
+    margin: 0 auto 3rem;
+  }
+
+  /* ─── KEYFRAMES ─── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.5; }
+    50%       { opacity: 1; }
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(6px); }
+  }
+
+  @keyframes sway {
+    0%, 100% { transform: rotate(-4deg); }
+    50%       { transform: rotate(4deg); }
+  }
+
+  @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    14%       { transform: scale(1.12); }
+    28%       { transform: scale(1); }
+    42%       { transform: scale(1.08); }
+    56%       { transform: scale(1); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── 1. OPENING ── -->
+<section id="opening">
+  <p class="opening-text">
+    Hi Suchir,<br><br>
+    I know you're far away right now…<br>
+    but I needed you to have something<br>
+    that <em>feels like me.</em>
+  </p>
+  <span class="scroll-hint">scroll slowly</span>
+  <span class="scroll-arrow">↓</span>
+</section>
+
+<!-- ── 2. LETTER ── -->
+<section id="letter">
+  <p class="letter-salutation">Dear Suchir,</p>
+  <div class="letter-body">
+
+    <p>I've been thinking about what to say since the moment I knew you were leaving. And somehow everything I rehearsed felt too polished, too neat — so I'm just going to say it the way I actually mean it.</p>
+
+    <p>You got into Atlassian. <em>Atlassian.</em> I hope you know what that means — not just the name of the company, but what it says about you. You worked for this quietly, consistently, without making a big thing of it. That's very you. And that's one of the thousand things I love about you.</p>
+
+    <p>I am so proud of you it's almost annoying. Like, genuinely, unreasonably proud. The kind where I want to tell strangers about it.</p>
+
+    <p>Three years, Suchir. That's not a small thing. That's figuring each other out through exams and bad days and the in-between moments that don't make great stories but make up most of a life. I'd choose all of it again without blinking.</p>
+
+    <p style="margin-top: 0;">The distance is going to be annoying, I'm not going to pretend otherwise. I'll probably reach for my phone at weird hours. I'll probably miss your stupid smile at the most random moments — when something funny happens, when I'm eating something good, when I'm just tired and want to sit next to someone who gets it.</p>
+
+    <p>But here's what I keep coming back to: this is supposed to be hard. It means something that it's hard. And two months is two months. Not forever.</p>
+
+    <p>When it gets overwhelming over there — and it might, because new cities, new people, new pressure are a lot all at once — I just want you to remember that you're not starting from zero. You have already proven, to me and to yourself, that you're capable of more than you think. Every single time you've doubted yourself, you've come out the other side fine. More than fine.</p>
+
+    <p>You're doing better than you think. I need you to know that.</p>
+
+    <p>Your smile, by the way, is still my favourite thing. I just wanted to say that somewhere you could read it.</p>
+
+    <p>Go be great. Go learn things and meet people and eat weird food and stay up too late and come back full of stories. I want to hear all of it.</p>
+
+    <p>But also — drink water. Sleep. Call me.</p>
+
+    <span class="signature">— your Golu</span>
+
+  </div>
+</section>
+
+<!-- ── 3. FLOWERS ── -->
+<section id="flowers">
+  <div class="section-divider"></div>
+  <div class="flowers-grid">
+
+    <div class="flower-item">
+      <svg class="flower-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="32" cy="20" rx="7" ry="13" fill="#f2c4bc" opacity="0.85"/>
+        <ellipse cx="44" cy="28" rx="7" ry="13" fill="#e8b4c8" opacity="0.8" transform="rotate(60 44 28)"/>
+        <ellipse cx="44" cy="44" rx="7" ry="13" fill="#d4c0e0" opacity="0.8" transform="rotate(120 44 44)"/>
+        <ellipse cx="32" cy="48" rx="7" ry="13" fill="#f2c4bc" opacity="0.85" transform="rotate(180 32 48)"/>
+        <ellipse cx="20" cy="44" rx="7" ry="13" fill="#e8b4c8" opacity="0.8" transform="rotate(240 20 44)"/>
+        <ellipse cx="20" cy="28" rx="7" ry="13" fill="#d4c0e0" opacity="0.8" transform="rotate(300 20 28)"/>
+        <circle cx="32" cy="34" r="7" fill="#f7e0d0"/>
+        <circle cx="32" cy="34" r="4" fill="#e8c4a8"/>
+      </svg>
+      <span class="flower-caption">for how proud I am of you</span>
+    </div>
+
+    <div class="flower-item">
+      <svg class="flower-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="32" cy="20" rx="6" ry="11" fill="#c8d8c0" opacity="0.85"/>
+        <ellipse cx="43" cy="27" rx="6" ry="11" fill="#b8d0c8" opacity="0.8" transform="rotate(72 43 27)"/>
+        <ellipse cx="39" cy="42" rx="6" ry="11" fill="#c4cce0" opacity="0.8" transform="rotate(144 39 42)"/>
+        <ellipse cx="25" cy="42" rx="6" ry="11" fill="#c8d8c0" opacity="0.8" transform="rotate(216 25 42)"/>
+        <ellipse cx="21" cy="27" rx="6" ry="11" fill="#b8d0c8" opacity="0.8" transform="rotate(288 21 27)"/>
+        <circle cx="32" cy="33" r="6" fill="#f0e8d0"/>
+        <circle cx="32" cy="33" r="3.5" fill="#e0d0b0"/>
+      </svg>
+      <span class="flower-caption">for every time you made me smile</span>
+    </div>
+
+    <div class="flower-item">
+      <svg class="flower-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="32" cy="18" rx="8" ry="12" fill="#f0c0d0" opacity="0.85"/>
+        <ellipse cx="46" cy="32" rx="8" ry="12" fill="#e0b8e8" opacity="0.8" transform="rotate(90 46 32)"/>
+        <ellipse cx="32" cy="46" rx="8" ry="12" fill="#f0c0d0" opacity="0.85" transform="rotate(180 32 46)"/>
+        <ellipse cx="18" cy="32" rx="8" ry="12" fill="#e0b8e8" opacity="0.8" transform="rotate(270 18 32)"/>
+        <circle cx="32" cy="32" r="7" fill="#fde8d8"/>
+        <circle cx="32" cy="32" r="4" fill="#f0c8b0"/>
+      </svg>
+      <span class="flower-caption">for us</span>
+    </div>
+
+    <div class="flower-item">
+      <svg class="flower-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="32" cy="19" rx="6" ry="12" fill="#ddc0e8" opacity="0.85"/>
+        <ellipse cx="44" cy="26" rx="6" ry="12" fill="#c8b8dc" opacity="0.8" transform="rotate(60 44 26)"/>
+        <ellipse cx="44" cy="42" rx="6" ry="12" fill="#e8c4d4" opacity="0.8" transform="rotate(120 44 42)"/>
+        <ellipse cx="32" cy="47" rx="6" ry="12" fill="#ddc0e8" opacity="0.85" transform="rotate(180 32 47)"/>
+        <ellipse cx="20" cy="42" rx="6" ry="12" fill="#c8b8dc" opacity="0.8" transform="rotate(240 20 42)"/>
+        <ellipse cx="20" cy="26" rx="6" ry="12" fill="#e8c4d4" opacity="0.8" transform="rotate(300 20 26)"/>
+        <circle cx="32" cy="33" r="6" fill="#f8f0e0"/>
+        <circle cx="32" cy="33" r="3.5" fill="#e8d8c0"/>
+      </svg>
+      <span class="flower-caption">for three years of choosing each other</span>
+    </div>
+
+    <div class="flower-item">
+      <svg class="flower-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="32" cy="20" rx="7" ry="11" fill="#f0d0b8" opacity="0.85"/>
+        <ellipse cx="43" cy="28" rx="7" ry="11" fill="#e8c4b0" opacity="0.8" transform="rotate(72 43 28)"/>
+        <ellipse cx="38" cy="43" rx="7" ry="11" fill="#f4d8c0" opacity="0.8" transform="rotate(144 38 43)"/>
+        <ellipse cx="26" cy="43" rx="7" ry="11" fill="#f0d0b8" opacity="0.85" transform="rotate(216 26 43)"/>
+        <ellipse cx="21" cy="28" rx="7" ry="11" fill="#e8c4b0" opacity="0.8" transform="rotate(288 21 28)"/>
+        <circle cx="32" cy="33" r="6.5" fill="#fdf0e4"/>
+        <circle cx="32" cy="33" r="3.5" fill="#ecd8c0"/>
+      </svg>
+      <span class="flower-caption">for coming back</span>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── 4. COMFORT ── -->
+<section id="comfort">
+  <div class="section-divider"></div>
+  <p class="comfort-heading">"If I were there right now…"</p>
+  <ul class="comfort-list">
+    <li><span class="comfort-dot"></span><span>I'd tell you to breathe for a second. Just one slow breath before whatever comes next.</span></li>
+    <li><span class="comfort-dot"></span><span>I'd probably make you drink water and pretend I wasn't watching to make sure you did.</span></li>
+    <li><span class="comfort-dot"></span><span>I'd sit next to you and not say anything, because sometimes that's actually what helps.</span></li>
+    <li><span class="comfort-dot"></span><span>I'd remind you — loudly, if needed — that you are not alone in this. Not even a little bit.</span></li>
+  </ul>
+</section>
+
+<!-- ── 5. FINALE ── -->
+<section id="finale">
+  <p class="finale-line1">Come back soon, okay?</p>
+  <p class="finale-line2">I'll be right here. Always.</p>
+  <p class="finale-sig">— your Golu</p>
+  <div class="heart">
+    <svg width="40" height="36" viewBox="0 0 40 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M20 34 C20 34 2 22 2 11 C2 5.5 6.5 2 11 2 C14.5 2 17.5 4 20 7 C22.5 4 25.5 2 29 2 C33.5 2 38 5.5 38 11 C38 22 20 34 20 34Z" fill="#e8a090" opacity="0.85"/>
+    </svg>
+  </div>
+</section>
+
+<script>
+  // Scroll-based fade-in for letter paragraphs, comfort items, finale
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.15 });
+
+  document.querySelectorAll(
+    '.letter-body p, .flower-item, .comfort-heading, .comfort-list li, .finale-line1, .finale-line2, .finale-sig, .heart'
+  ).forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
