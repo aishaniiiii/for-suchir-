@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>a night with you</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+
+:root{
+  --cream:#f7f0e6;
+  --warm:#f2e4cc;
+  --amber:#e8c98a;
+  --brown:#8b6340;
+  --dark-brown:#5c3d1e;
+  --text:#3d2b1a;
+  --muted:#9a7d62;
+  --soft:#c4a882;
+  --night:#1a1008;
+  --night2:#2d1f0e;
+}
+
+html{scroll-behavior:smooth;}
+
+body{
+  background:var(--cream);
+  color:var(--text);
+  font-family:'Lora',serif;
+  overflow-x:hidden;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:var(--warm);}
+::-webkit-scrollbar-thumb{background:var(--soft);border-radius:2px;}
+
+/* ── SECTIONS ── */
+section{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:4rem 2rem;
+  position:relative;
+  overflow:hidden;
+}
+
+/* ── FADE ELEMENTS ── */
+.fade{
+  opacity:0;
+  transform:translateY(22px);
+  transition:opacity 1.1s ease, transform 1.1s ease;
+}
+.fade.visible{opacity:1;transform:translateY(0);}
+.fade.delay-1{transition-delay:0.25s;}
+.fade.delay-2{transition-delay:0.55s;}
+.fade.delay-3{transition-delay:0.85s;}
+.fade.delay-4{transition-delay:1.15s;}
+.fade.delay-5{transition-delay:1.45s;}
+.fade.delay-6{transition-delay:1.75s;}
+
+/* ── TYPOGRAPHY ── */
+.text-block{
+  max-width:520px;
+  text-align:center;
+  position:relative;
+  z-index:10;
+}
+
+p.line{
+  font-size:clamp(1rem,2.2vw,1.25rem);
+  font-weight:300;
+  line-height:2;
+  color:var(--text);
+  margin-bottom:0.2rem;
+}
+p.line.italic{font-style:italic;}
+p.line.small{font-size:clamp(0.85rem,1.6vw,1rem);color:var(--muted);}
+p.line.big{font-size:clamp(1.3rem,3vw,1.8rem);font-weight:400;}
+p.line.warm{color:var(--brown);}
+p.line.sign{color:var(--brown);font-style:italic;font-size:clamp(1rem,2vw,1.2rem);margin-top:1rem;}
+
+.spacer{height:1.8rem;}
+.spacer-sm{height:0.8rem;}
+
+/* ══════════════════════════════
+   §1 OPENING
+══════════════════════════════ */
+#opening{
+  background:linear-gradient(160deg,#f5ead8 0%,#ede0c8 60%,#e4d0b0 100%);
+  gap:0;
+}
+
+/* warm lamp glow */
+#opening::before{
+  content:'';
+  position:absolute;
+  top:-80px;right:-60px;
+  width:340px;height:340px;
+  background:radial-gradient(circle,rgba(255,200,100,0.22) 0%,transparent 70%);
+  border-radius:50%;
+  pointer-events:none;
+}
+
+.opening-year{
+  font-family:'DM Sans',sans-serif;
+  font-size:0.68rem;
+  letter-spacing:0.3em;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin-bottom:3rem;
+}
+
+/* ══════════════════════════════
+   §2 LIVING ROOM
+══════════════════════════════ */
+#living{
+  background:linear-gradient(180deg,#f0e0c4 0%,#ead4b0 100%);
+  padding-bottom:6rem;
+}
+
+/* ROOM ILLUSTRATION */
+.room{
+  width:min(480px,90vw);
+  height:260px;
+  position:relative;
+  margin-bottom:3.5rem;
+}
+
+/* floor */
+.floor{
+  position:absolute;
+  bottom:0;left:0;right:0;
+  height:40px;
+  background:linear-gradient(to bottom,#c9a87a,#b8926a);
+  border-radius:0 0 16px 16px;
+}
+/* wall */
+.wall{
+  position:absolute;
+  inset:0;bottom:40px;
+  background:linear-gradient(160deg,#f5deb8 0%,#ecd0a0 100%);
+  border-radius:16px 16px 0 0;
+  overflow:hidden;
+}
+/* wall texture line */
+.wall::after{
+  content:'';
+  position:absolute;
+  bottom:0;left:0;right:0;
+  height:6px;
+  background:rgba(139,99,64,0.15);
+}
+
+/* window */
+.window{
+  position:absolute;
+  top:18px;left:50%;
+  transform:translateX(-50%);
+  width:90px;height:64px;
+  background:linear-gradient(160deg,#d4e8f0 0%,#b8d8e8 100%);
+  border-radius:8px 8px 4px 4px;
+  border:3px solid #c4a070;
+  box-shadow:inset 0 2px 8px rgba(100,160,200,0.3);
+  overflow:hidden;
+}
+.window::before{content:'';position:absolute;top:0;left:50%;width:2px;height:100%;background:rgba(196,160,112,0.6);}
+.window::after{content:'';position:absolute;top:50%;left:0;width:100%;height:2px;background:rgba(196,160,112,0.6);}
+/* moon in window */
+.moon-in-window{
+  position:absolute;
+  top:8px;right:10px;
+  width:14px;height:14px;
+  background:#ffeeb0;
+  border-radius:50%;
+  box-shadow:0 0 8px rgba(255,230,150,0.8);
+}
+
+/* sofa */
+.sofa{
+  position:absolute;
+  bottom:40px;
+  left:50%;
+  transform:translateX(-50%);
+  width:230px;
+}
+.sofa-back{
+  height:50px;
+  background:linear-gradient(to bottom,#c47a50,#a85e38);
+  border-radius:12px 12px 0 0;
+  position:relative;
+}
+.sofa-back::before,.sofa-back::after{
+  content:'';
+  position:absolute;
+  bottom:-4px;
+  width:26px;height:26px;
+  background:#a85e38;
+  border-radius:50%;
+}
+.sofa-back::before{left:8px;}
+.sofa-back::after{right:8px;}
+.sofa-seat{
+  height:32px;
+  background:linear-gradient(to bottom,#d4844a,#c07040);
+  border-radius:0 0 10px 10px;
+  box-shadow:0 4px 10px rgba(80,40,10,0.2);
+}
+/* sofa legs */
+.sofa-legs{
+  display:flex;justify-content:space-between;
+  padding:0 20px;
+}
+.sofa-leg{width:8px;height:10px;background:#7a4a28;border-radius:0 0 3px 3px;}
+
+/* coffee table */
+.table{
+  position:absolute;
+  bottom:56px;
+  left:50%;
+  transform:translateX(-24px);
+  width:90px;height:14px;
+  background:linear-gradient(to bottom,#c4904a,#a87030);
+  border-radius:4px;
+  box-shadow:0 3px 8px rgba(80,40,10,0.25);
+}
+.table::before,.table::after{
+  content:'';
+  position:absolute;
+  bottom:-12px;
+  width:6px;height:12px;
+  background:#8a5820;
+  border-radius:0 0 2px 2px;
+}
+.table::before{left:10px;}
+.table::after{right:10px;}
+
+/* mug on table */
+.mug{
+  position:absolute;
+  bottom:72px;
+  left:50%;
+  transform:translateX(16px);
+  width:12px;height:14px;
+  background:#e8d0a0;
+  border-radius:3px 3px 4px 4px;
+  border:1.5px solid #c4a070;
+}
+.mug::before{
+  content:'';
+  position:absolute;
+  top:2px;right:-6px;
+  width:5px;height:8px;
+  border:1.5px solid #c4a070;
+  border-radius:0 4px 4px 0;
+  border-left:none;
+}
+
+/* laptop glow on sofa */
+.laptop{
+  position:absolute;
+  bottom:94px;
+  left:50%;
+  transform:translateX(-52px);
+  width:44px;
+}
+.laptop-screen{
+  height:30px;
+  background:linear-gradient(135deg,#c8e0f8,#a8c8f0);
+  border-radius:4px 4px 0 0;
+  border:2px solid #7a8898;
+  box-shadow:0 0 12px rgba(150,200,255,0.5),inset 0 0 6px rgba(100,160,230,0.3);
+  position:relative;
+  overflow:hidden;
+}
+.laptop-screen::after{
+  content:'';
+  position:absolute;
+  top:4px;left:4px;right:4px;
+  height:2px;background:rgba(180,220,255,0.6);
+  border-radius:1px;
+  box-shadow:0 5px 0 rgba(180,220,255,0.4),0 10px 0 rgba(180,220,255,0.3);
+}
+.laptop-base{
+  height:5px;
+  background:#8a8898;
+  border-radius:0 0 3px 3px;
+  margin-top:1px;
+}
+
+/* floor lamp */
+.lamp{
+  position:absolute;
+  bottom:40px;
+  right:32px;
+}
+.lamp-pole{width:4px;height:80px;background:#a07848;margin:0 auto;border-radius:2px;}
+.lamp-shade{
+  width:32px;height:18px;
+  background:linear-gradient(to bottom,#f5d080,#e8b840);
+  border-radius:50% 50% 20% 20%;
+  margin-bottom:-1px;
+  position:relative;
+  box-shadow:0 0 20px rgba(255,200,80,0.45);
+}
+.lamp-shade::after{
+  content:'';
+  position:absolute;
+  bottom:-3px;left:50%;
+  transform:translateX(-50%);
+  width:6px;height:6px;
+  background:#c89030;
+  border-radius:50%;
+}
+.lamp-glow{
+  position:absolute;
+  bottom:120px;right:14px;
+  width:80px;height:80px;
+  background:radial-gradient(circle,rgba(255,200,80,0.35) 0%,transparent 70%);
+  border-radius:50%;
+  pointer-events:none;
+}
+
+/* bookshelf */
+.shelf{
+  position:absolute;
+  top:28px;left:22px;
+  width:50px;
+}
+.shelf-board{height:6px;background:#b08040;border-radius:2px;box-shadow:0 2px 4px rgba(80,40,10,0.2);}
+.books{display:flex;gap:2px;margin-bottom:3px;align-items:flex-end;}
+.book{border-radius:2px 2px 0 0;}
+
+/* person on sofa — figure */
+.figure{
+  position:absolute;
+  bottom:92px;
+  left:50%;
+  transform:translateX(-18px);
+}
+.figure-head{
+  width:18px;height:18px;
+  background:#d4a478;
+  border-radius:50%;
+  margin:0 auto 2px;
+  position:relative;
+}
+/* hair */
+.figure-head::before{
+  content:'';
+  position:absolute;
+  top:-2px;left:-1px;right:-1px;
+  height:10px;
+  background:#3d2010;
+  border-radius:50% 50% 0 0;
+}
+.figure-body{
+  width:22px;height:28px;
+  background:#6a8caa;
+  border-radius:8px 8px 4px 4px;
+  margin:0 auto;
+}
+
+/* person 2 sitting next to */
+.figure2{
+  position:absolute;
+  bottom:92px;
+  left:50%;
+  transform:translateX(18px);
+}
+.figure2-head{
+  width:16px;height:16px;
+  background:#d4a478;
+  border-radius:50%;
+  margin:0 auto 2px;
+  position:relative;
+}
+.figure2-head::before{
+  content:'';
+  position:absolute;
+  top:-3px;left:-2px;right:-2px;
+  height:11px;
+  background:#1a0a04;
+  border-radius:50% 50% 0 0;
+}
+.figure2-body{
+  width:20px;height:26px;
+  background:#e8988a;
+  border-radius:8px 8px 4px 4px;
+  margin:0 auto;
+}
+
+/* ══════════════════════════════
+   §3 FOOD
+══════════════════════════════ */
+#food{
+  background:linear-gradient(180deg,#ead4b0 0%,#e4c898 100%);
+}
+
+/* kitchen counter */
+.kitchen{
+  width:min(400px,88vw);
+  height:180px;
+  position:relative;
+  margin-bottom:3rem;
+}
+.counter-top{
+  position:absolute;
+  bottom:50px;left:0;right:0;
+  height:18px;
+  background:linear-gradient(to bottom,#d4c0a0,#c0a880);
+  border-radius:6px;
+  box-shadow:0 4px 12px rgba(80,50,20,0.2);
+}
+.counter-body{
+  position:absolute;
+  bottom:0;left:10px;right:10px;
+  height:50px;
+  background:linear-gradient(to bottom,#a07848,#886030);
+  border-radius:0 0 8px 8px;
+}
+/* bowl */
+.bowl{
+  position:absolute;
+  bottom:68px;
+  left:50%;
+  transform:translateX(-30px);
+  width:50px;height:22px;
+  background:linear-gradient(to bottom,#e8d0b0,#d8b890);
+  border-radius:0 0 26px 26px;
+  border-top:2px solid #c4a878;
+  box-shadow:0 3px 8px rgba(80,50,20,0.15);
+}
+.bowl::after{
+  content:'';
+  position:absolute;
+  top:4px;left:8px;right:8px;
+  height:6px;
+  background:radial-gradient(ellipse,#e85830 0%,#c44020 60%,transparent 100%);
+  border-radius:50%;
+  opacity:0.8;
+}
+/* steam */
+.steam{
+  position:absolute;
+  bottom:90px;
+  left:50%;
+}
+.steam span{
+  display:inline-block;
+  width:2px;
+  background:rgba(200,170,130,0.4);
+  border-radius:1px;
+  margin:0 3px;
+  animation:steamRise 2s ease-in-out infinite;
+}
+.steam span:nth-child(1){height:12px;animation-delay:0s;}
+.steam span:nth-child(2){height:18px;animation-delay:0.3s;}
+.steam span:nth-child(3){height:10px;animation-delay:0.6s;}
+@keyframes steamRise{
+  0%,100%{transform:translateY(0) scaleX(1);opacity:0.5;}
+  50%{transform:translateY(-8px) scaleX(1.4);opacity:0.15;}
+}
+/* spoon */
+.spoon{
+  position:absolute;
+  bottom:58px;
+  left:50%;
+  transform:translateX(28px) rotate(30deg);
+  width:4px;height:36px;
+  background:linear-gradient(to bottom,#d0c0a0,#b0a080);
+  border-radius:2px;
+}
+.spoon::before{
+  content:'';
+  position:absolute;
+  top:-8px;left:-4px;
+  width:12px;height:12px;
+  background:linear-gradient(to bottom,#c8b890,#b0a070);
+  border-radius:50%;
+}
+
+/* ══════════════════════════════
+   §4 NIGHT / KITCHEN
+══════════════════════════════ */
+#night{
+  background:linear-gradient(180deg,#1e1408 0%,#120e06 100%);
+  color:#e8d8c0;
+}
+#night p.line{color:#e8d8c0;}
+#night p.line.small{color:#7a6a54;}
+#night p.line.warm{color:#d4a860;}
+
+/* fridge light scene */
+.fridge-scene{
+  width:min(360px,88vw);
+  height:200px;
+  position:relative;
+  margin-bottom:3rem;
+}
+/* dark kitchen bg */
+.kitchen-dark{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(to bottom,#0d0a04,#1a1208);
+  border-radius:16px;
+  overflow:hidden;
+}
+/* fridge glow */
+.fridge-glow{
+  position:absolute;
+  bottom:0;
+  left:50%;
+  transform:translateX(-50%);
+  width:90px;
+  background:linear-gradient(to top,rgba(200,230,255,0.18),rgba(200,230,255,0.04),transparent);
+  height:180px;
+  border-radius:0 0 8px 8px;
+  pointer-events:none;
+}
+.fridge-body{
+  position:absolute;
+  bottom:0;left:50%;
+  transform:translateX(-50%);
+  width:80px;height:150px;
+  background:linear-gradient(160deg,#2a2820,#1e1c16);
+  border-radius:6px 6px 0 0;
+  border:1.5px solid rgba(255,255,255,0.06);
+  overflow:hidden;
+}
+/* fridge open light */
+.fridge-open{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(to bottom,rgba(200,225,255,0.12),transparent);
+  animation:fridgePulse 4s ease-in-out infinite;
+}
+@keyframes fridgePulse{
+  0%,100%{opacity:0.7;}50%{opacity:1;}
+}
+/* fridge handle */
+.fridge-handle{
+  position:absolute;
+  top:30px;right:8px;
+  width:5px;height:30px;
+  background:rgba(255,255,255,0.15);
+  border-radius:3px;
+}
+/* shelf lines in fridge */
+.fridge-shelf{
+  position:absolute;
+  left:8px;right:8px;height:1px;
+  background:rgba(255,255,255,0.08);
+}
+
+/* two figures standing */
+.night-figures{
+  position:absolute;
+  bottom:0;
+  left:50%;
+  transform:translateX(-80px);
+  display:flex;
+  gap:6px;
+  align-items:flex-end;
+}
+.nf{display:flex;flex-direction:column;align-items:center;}
+.nf-head{width:16px;height:16px;border-radius:50%;background:#c4906a;}
+.nf-head.h2{background:#c4906a;}
+.nf-head::before{
+  content:'';position:absolute;
+  top:0;width:18px;height:8px;
+  border-radius:50% 50% 0 0;
+}
+.nf-body{width:18px;height:30px;border-radius:6px 6px 3px 3px;margin-top:2px;}
+.nf1 .nf-head{position:relative;}
+.nf1 .nf-head::before{background:#2a1608;left:-1px;}
+.nf1 .nf-body{background:#3a4858;}
+.nf2 .nf-head{position:relative;}
+.nf2 .nf-head::before{background:#180804;left:-1px;}
+.nf2 .nf-body{background:#884a5a;}
+
+/* floor reflection */
+.floor-reflect{
+  position:absolute;
+  bottom:0;left:0;right:0;
+  height:20px;
+  background:linear-gradient(to top,rgba(200,225,255,0.06),transparent);
+}
+
+/* stars outside */
+.night-star{
+  position:absolute;
+  background:#fffbe0;
+  border-radius:50%;
+  animation:twinkle 3s ease-in-out infinite;
+}
+@keyframes twinkle{0%,100%{opacity:0.3;}50%{opacity:0.9;}}
+
+/* ══════════════════════════════
+   §5 QUIET MOMENT
+══════════════════════════════ */
+#quiet{
+  background:linear-gradient(180deg,#120e06 0%,#1e160a 50%,#2a1e10 100%);
+  color:#e8d8c0;
+}
+#quiet p.line{color:#e8d8c0;}
+#quiet p.line.small{color:#7a6a54;}
+#quiet p.line.warm{color:#d4a860;}
+
+.bed-scene{
+  width:min(380px,88vw);
+  height:160px;
+  position:relative;
+  margin-bottom:3rem;
+}
+/* bed frame */
+.bed-frame{
+  position:absolute;
+  bottom:20px;left:50%;
+  transform:translateX(-50%);
+  width:260px;
+}
+.bed-head{
+  height:40px;
+  background:linear-gradient(to bottom,#5c3820,#4a2a14);
+  border-radius:8px 8px 0 0;
+  position:relative;
+}
+.bed-head::before,.bed-head::after{
+  content:'';position:absolute;
+  bottom:-3px;width:10px;height:6px;
+  background:#3a2010;border-radius:0 0 3px 3px;
+}
+.bed-head::before{left:16px;}
+.bed-head::after{right:16px;}
+.bed-mattress{
+  height:50px;
+  background:linear-gradient(to bottom,#ddd0b8,#ccc0a8);
+  position:relative;
+  overflow:hidden;
+}
+/* blanket */
+.blanket{
+  position:absolute;
+  top:8px;left:0;right:0;
+  height:42px;
+  background:linear-gradient(135deg,#8a6848,#7a5838);
+  border-radius:3px;
+}
+.blanket::after{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:12px;
+  background:linear-gradient(to bottom,#9a7858,#8a6848);
+  border-radius:3px 3px 30% 30%;
+}
+/* pillows */
+.pillow{
+  position:absolute;
+  top:4px;
+  width:50px;height:26px;
+  background:linear-gradient(135deg,#f0e4d0,#e4d4bc);
+  border-radius:8px;
+  border:1px solid rgba(200,180,150,0.5);
+}
+.pillow1{left:20px;}
+.pillow2{left:76px;}
+/* bedside lamp glow */
+.bedside-glow{
+  position:absolute;
+  bottom:60px;right:20px;
+  width:50px;height:60px;
+  background:radial-gradient(ellipse at 50% 100%,rgba(255,190,80,0.25),transparent 70%);
+  border-radius:50%;
+}
+
+/* ══════════════════════════════
+   §6 FINAL
+══════════════════════════════ */
+#final{
+  background:linear-gradient(180deg,#2a1e10 0%,#3d2a14 40%,#f0dfc0 100%);
+  min-height:110vh;
+  justify-content:flex-end;
+  padding-bottom:8rem;
+}
+#final-inner{
+  max-width:520px;
+  text-align:center;
+  position:relative;
+  z-index:10;
+}
+#final-inner p.line{color:#3d2b1a;}
+#final-inner p.line.warm{color:var(--brown);}
+#final-inner p.line.sign{color:var(--dark-brown);font-size:1.1rem;}
+
+/* sunrise bg glow */
+#final::before{
+  content:'';
+  position:absolute;
+  bottom:0;left:50%;
+  transform:translateX(-50%);
+  width:120%;height:60%;
+  background:radial-gradient(ellipse 80% 60% at 50% 100%,rgba(255,200,100,0.3),transparent 70%);
+  pointer-events:none;
+}
+
+/* ── SECTION DIVIDERS ── */
+.divider{
+  width:40px;height:1px;
+  background:linear-gradient(to right,transparent,var(--soft),transparent);
+  margin:2rem auto;
+}
+
+/* ── PROGRESS DOT ── */
+#progress{
+  position:fixed;right:1.2rem;top:50%;
+  transform:translateY(-50%);
+  display:flex;flex-direction:column;gap:10px;
+  z-index:100;
+}
+.prog-dot{
+  width:5px;height:5px;
+  border-radius:50%;
+  background:var(--soft);
+  opacity:0.3;
+  transition:opacity 0.4s,transform 0.4s;
+  cursor:pointer;
+}
+.prog-dot.active{opacity:1;transform:scale(1.5);}
+</style>
+</head>
+<body>
+
+<!-- PROGRESS DOTS -->
+<div id="progress">
+  <div class="prog-dot active" onclick="scrollTo(0,0)"></div>
+  <div class="prog-dot" onclick="document.getElementById('living').scrollIntoView({behavior:'smooth'})"></div>
+  <div class="prog-dot" onclick="document.getElementById('food').scrollIntoView({behavior:'smooth'})"></div>
+  <div class="prog-dot" onclick="document.getElementById('night').scrollIntoView({behavior:'smooth'})"></div>
+  <div class="prog-dot" onclick="document.getElementById('quiet').scrollIntoView({behavior:'smooth'})"></div>
+  <div class="prog-dot" onclick="document.getElementById('final').scrollIntoView({behavior:'smooth'})"></div>
+</div>
+
+<!-- ══ §1 OPENING ══ -->
+<section id="opening">
+  <div class="text-block">
+    <p class="line small fade" style="letter-spacing:0.2em;font-family:'DM Sans',sans-serif;font-size:0.65rem;text-transform:uppercase;margin-bottom:3rem;">sunday evening · 10 years later</p>
+    <p class="line big fade delay-1">10 years from now…</p>
+    <div class="spacer-sm"></div>
+    <p class="line big italic fade delay-2">we're home.</p>
+    <div class="spacer"></div>
+    <p class="line small fade delay-3" style="font-family:'DM Sans',sans-serif;letter-spacing:0.18em;text-transform:uppercase;font-size:0.62rem;">scroll slowly ↓</p>
+  </div>
+</section>
+
+<!-- ══ §2 LIVING ROOM ══ -->
+<section id="living">
+
+  <!-- ROOM ILLUSTRATION -->
+  <div class="room fade">
+    <div class="wall">
+      <!-- window -->
+      <div class="window"><div class="moon-in-window"></div></div>
+      <!-- bookshelf -->
+      <div class="shelf">
+        <div class="books">
+          <div class="book" style="width:8px;height:28px;background:#c06040;"></div>
+          <div class="book" style="width:6px;height:22px;background:#6080b0;"></div>
+          <div class="book" style="width:9px;height:30px;background:#80a060;"></div>
+          <div class="book" style="width:7px;height:24px;background:#c09040;"></div>
+          <div class="book" style="width:5px;height:20px;background:#9060a0;"></div>
+        </div>
+        <div class="shelf-board"></div>
+      </div>
+    </div>
+    <!-- lamp glow -->
+    <div class="lamp-glow"></div>
+    <!-- sofa -->
+    <div class="sofa" style="position:absolute;bottom:40px;left:50%;transform:translateX(-50%);width:230px;">
+      <div class="sofa-back"></div>
+      <div class="sofa-seat"></div>
+      <div class="sofa-legs"><div class="sofa-leg"></div><div class="sofa-leg"></div></div>
+    </div>
+    <!-- figures on sofa -->
+    <div class="figure">
+      <div class="figure-head"></div>
+      <div class="figure-body"></div>
+    </div>
+    <div class="figure2">
+      <div class="figure2-head"></div>
+      <div class="figure2-body"></div>
+    </div>
+    <!-- laptop -->
+    <div class="laptop">
+      <div class="laptop-screen"></div>
+      <div class="laptop-base"></div>
+    </div>
+    <!-- coffee table -->
+    <div class="table"></div>
+    <!-- mug -->
+    <div class="mug"></div>
+    <!-- lamp -->
+    <div class="lamp">
+      <div class="lamp-shade"></div>
+      <div class="lamp-pole"></div>
+    </div>
+    <div class="floor"></div>
+  </div>
+
+  <div class="text-block">
+    <p class="line italic fade">you're on your laptop…</p>
+    <p class="line italic fade delay-1">working, focused like always.</p>
+    <div class="spacer-sm"></div>
+    <p class="line fade delay-2">I'm pretending to let you work.</p>
+    <div class="spacer-sm"></div>
+    <p class="line small italic fade delay-3">(I'm not.)</p>
+    <div class="divider fade delay-4"></div>
+    <p class="line fade delay-4">I keep stealing your attention</p>
+    <p class="line italic fade delay-5">and you act annoyed.</p>
+    <div class="spacer-sm"></div>
+    <p class="line warm fade delay-6">you're not.</p>
+  </div>
+</section>
+
+<!-- ══ §3 FOOD ══ -->
+<section id="food">
+  <!-- KITCHEN ILLUSTRATION -->
+  <div class="kitchen fade">
+    <div class="steam">
+      <span></span><span></span><span></span>
+    </div>
+    <div class="bowl"></div>
+    <div class="spoon"></div>
+    <div class="counter-top"></div>
+    <div class="counter-body">
+      <div style="display:flex;justify-content:space-between;padding:8px 12px;">
+        <div style="width:18px;height:24px;background:rgba(255,255,255,0.04);border-radius:3px;border:1px solid rgba(255,255,255,0.08);"></div>
+        <div style="width:14px;height:20px;background:rgba(255,255,255,0.04);border-radius:3px;border:1px solid rgba(255,255,255,0.08);"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="text-block">
+    <p class="line big fade">you made food today.</p>
+    <div class="spacer-sm"></div>
+    <p class="line italic fade delay-1">of course you won't let me help properly.</p>
+    <div class="spacer-sm"></div>
+    <p class="line small fade delay-2">"just sit, I've got it"</p>
+    <div class="divider fade delay-3"></div>
+    <p class="line fade delay-3">and then you end up feeding me anyway.</p>
+    <div class="spacer-sm"></div>
+    <p class="line warm italic fade delay-4">every single time.</p>
+    <div class="spacer-sm"></div>
+    <p class="line small fade delay-5">(also it's amazing and I won't admit it in the moment)</p>
+  </div>
+</section>
+
+<!-- ══ §4 NIGHT ══ -->
+<section id="night">
+  <!-- FRIDGE SCENE -->
+  <div class="fridge-scene fade">
+    <div class="kitchen-dark">
+      <!-- stars -->
+      <div class="night-star" style="width:2px;height:2px;top:15px;left:40px;animation-delay:0s;"></div>
+      <div class="night-star" style="width:1.5px;height:1.5px;top:25px;left:90px;animation-delay:0.8s;"></div>
+      <div class="night-star" style="width:1px;height:1px;top:10px;right:50px;animation-delay:0.4s;"></div>
+      <div class="night-star" style="width:2px;height:2px;top:35px;right:30px;animation-delay:1.2s;"></div>
+      <div class="fridge-glow"></div>
+    </div>
+    <div class="fridge-body">
+      <div class="fridge-open"></div>
+      <div class="fridge-handle"></div>
+      <div class="fridge-shelf" style="top:40px;"></div>
+      <div class="fridge-shelf" style="top:75px;"></div>
+      <div class="fridge-shelf" style="top:110px;"></div>
+    </div>
+    <!-- two figures -->
+    <div class="night-figures">
+      <div class="nf nf1">
+        <div class="nf-head" style="position:relative;">
+          <div style="position:absolute;top:-3px;left:-1px;right:-1px;height:9px;background:#2a1608;border-radius:50% 50% 0 0;"></div>
+        </div>
+        <div class="nf-body" style="background:#3a4858;width:18px;height:28px;border-radius:6px 6px 3px 3px;margin-top:2px;"></div>
+      </div>
+      <div class="nf nf2">
+        <div class="nf-head" style="position:relative;">
+          <div style="position:absolute;top:-4px;left:-2px;right:-2px;height:11px;background:#180804;border-radius:50% 50% 0 0;"></div>
+        </div>
+        <div class="nf-body" style="background:#884a5a;width:16px;height:26px;border-radius:6px 6px 3px 3px;margin-top:2px;"></div>
+      </div>
+    </div>
+    <div class="floor-reflect"></div>
+  </div>
+
+  <div class="text-block">
+    <p class="line big fade">it's late.</p>
+    <div class="spacer-sm"></div>
+    <p class="line italic fade delay-1">the only light is from the fridge.</p>
+    <div class="spacer-sm"></div>
+    <p class="line fade delay-2">we're standing there, half asleep, half laughing</p>
+    <p class="line italic fade delay-3">about nothing important.</p>
+    <div class="divider fade delay-4"></div>
+    <p class="line fade delay-4">and then somehow we start dancing.</p>
+    <div class="spacer-sm"></div>
+    <p class="line small italic fade delay-5">like idiots.</p>
+    <div class="spacer-sm"></div>
+    <p class="line warm fade delay-6">my favourite kind.</p>
+  </div>
+</section>
+
+<!-- ══ §5 QUIET ══ -->
+<section id="quiet">
+  <!-- BED SCENE -->
+  <div class="bed-scene fade">
+    <div class="bedside-glow"></div>
+    <div class="bed-frame">
+      <div class="bed-head"></div>
+      <div class="bed-mattress">
+        <div class="blanket"></div>
+        <div class="pillow pillow1"></div>
+        <div class="pillow pillow2"></div>
+      </div>
+    </div>
+    <!-- bedside table -->
+    <div style="position:absolute;bottom:20px;right:30px;width:28px;">
+      <div style="height:5px;background:#7a5030;border-radius:3px 3px 0 0;"></div>
+      <div style="height:28px;background:#6a4020;border-radius:0 0 4px 4px;"></div>
+      <!-- lamp -->
+      <div style="width:20px;height:16px;background:radial-gradient(circle at 50% 80%,rgba(255,190,80,0.6),rgba(255,150,40,0.2));border-radius:50% 50% 30% 30%;margin:-10px auto 0;border:1px solid rgba(200,150,50,0.3);box-shadow:0 0 14px rgba(255,180,60,0.4);"></div>
+    </div>
+  </div>
+
+  <div class="text-block">
+    <p class="line big fade">we finally slow down.</p>
+    <div class="spacer"></div>
+    <p class="line italic fade delay-1">just… existing next to each other.</p>
+    <div class="spacer-sm"></div>
+    <p class="line fade delay-2">no rush.</p>
+    <p class="line fade delay-3">no distance.</p>
+    <p class="line fade delay-4">no countdowns.</p>
+    <div class="divider fade delay-5"></div>
+    <p class="line big warm fade delay-5">just us.</p>
+  </div>
+</section>
+
+<!-- ══ §6 FINAL ══ -->
+<section id="final">
+  <div id="final-inner">
+    <p class="line fade">I don't know exactly how life will look.</p>
+    <div class="spacer-sm"></div>
+    <p class="line italic fade delay-1">the city, the apartment, the routines—</p>
+    <p class="line italic fade delay-2">all of that, I can figure out.</p>
+    <div class="divider fade delay-3"></div>
+    <p class="line big fade delay-3">but I know this part stays.</p>
+    <div class="spacer"></div>
+    <p class="line fade delay-4">you making food and not letting me help.</p>
+    <p class="line fade delay-4">me distracting you from your laptop.</p>
+    <p class="line fade delay-5">us, at midnight, in fridge light, dancing like idiots.</p>
+    <div class="spacer"></div>
+    <p class="line big italic warm fade delay-5">you… and me… like this.</p>
+    <div class="divider fade delay-6"></div>
+    <p class="line fade delay-6">I already see this life with you, Suchir.</p>
+    <div class="spacer-sm"></div>
+    <p class="line italic warm fade delay-6">I think I always have.</p>
+    <div class="spacer"></div>
+    <div class="spacer"></div>
+    <p class="line fade" style="transition-delay:2.1s;color:#3d2b1a;">so come back soon, okay?</p>
+    <p class="line italic fade" style="transition-delay:2.4s;color:#3d2b1a;">we've got a whole life to get to.</p>
+    <div class="spacer"></div>
+    <p class="line sign fade" style="transition-delay:2.8s;">— your Golu 🌸</p>
+  </div>
+</section>
+
+<script>
+// ── FADE ON SCROLL ───────────────────────────────
+const fades = document.querySelectorAll('.fade');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) e.target.classList.add('visible');
+  });
+}, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+fades.forEach(el => observer.observe(el));
+
+// ── PROGRESS DOTS ────────────────────────────────
+const sections = ['opening','living','food','night','quiet','final'];
+const dots = document.querySelectorAll('.prog-dot');
+const sectionEls = sections.map(id => document.getElementById(id));
+
+const secObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const idx = sectionEls.indexOf(e.target);
+      dots.forEach((d,i) => d.classList.toggle('active', i === idx));
+    }
+  });
+}, { threshold: 0.5 });
+sectionEls.forEach(el => el && secObs.observe(el));
+
+// ── PARALLAX SUBTLE ──────────────────────────────
+window.addEventListener('scroll', () => {
+  const y = window.scrollY;
+  // very subtle parallax on opening text
+  const op = document.querySelector('#opening .text-block');
+  if (op) op.style.transform = `translateY(${y * 0.18}px)`;
+});
+
+// ── BACKGROUND WARM SHIFT on scroll ─────────────
+// handled purely via CSS gradient per section
+</script>
+</body>
+</html>
