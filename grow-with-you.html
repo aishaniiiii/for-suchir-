@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For Suchir 🌱</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #fdf6f0 0%, #fce4ec 30%, #e8f5e9 70%, #f3e5f5 100%);
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+    padding: 2rem 1rem;
+  }
+
+  .page {
+    text-align: center;
+    max-width: 520px;
+    width: 100%;
+  }
+
+  .intro {
+    margin-bottom: 2.5rem;
+    opacity: 0;
+    animation: fadeUp 1.2s ease forwards 0.3s;
+  }
+
+  .intro p {
+    font-family: 'Lora', serif;
+    font-size: 1.1rem;
+    color: #7c5c6e;
+    line-height: 1.9;
+    font-style: italic;
+  }
+
+  .plant-area {
+    position: relative;
+    width: 220px;
+    height: 260px;
+    margin: 0 auto 2rem;
+    opacity: 0;
+    animation: fadeUp 1.2s ease forwards 0.7s;
+  }
+
+  .plant-svg {
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform-origin: bottom center;
+    filter: drop-shadow(0 8px 24px rgba(180, 120, 140, 0.15));
+  }
+
+  .soil {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 22px;
+    background: linear-gradient(to bottom, #c8a882, #a07850);
+    border-radius: 50%;
+    z-index: 2;
+  }
+
+  .pot {
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 50px;
+    background: linear-gradient(160deg, #e8927c, #c96a52);
+    border-radius: 4px 4px 14px 14px;
+    z-index: 1;
+  }
+  .pot::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: -6px;
+    right: -6px;
+    height: 12px;
+    background: #d47a62;
+    border-radius: 4px;
+  }
+
+  .stage-label {
+    font-family: 'Lora', serif;
+    font-size: 0.82rem;
+    color: #b07090;
+    letter-spacing: 0.06em;
+    margin-bottom: 1.5rem;
+    font-style: italic;
+    min-height: 1.2em;
+    transition: opacity 0.4s;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 1s;
+  }
+
+  .grow-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 36px;
+    background: linear-gradient(135deg, #f8bbd9, #c8e6c9);
+    border: none;
+    border-radius: 50px;
+    font-family: 'Lora', serif;
+    font-size: 1rem;
+    color: #6d4c6a;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.4s;
+    box-shadow: 0 4px 20px rgba(200, 120, 160, 0.25);
+    letter-spacing: 0.02em;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 1.2s;
+  }
+
+  .grow-btn:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 8px 28px rgba(200, 120, 160, 0.35);
+  }
+
+  .grow-btn:active {
+    transform: scale(0.97);
+  }
+
+  .grow-btn.hidden { display: none; }
+
+  .progress-dots {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 1.6rem;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 1.4s;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #e0c4d4;
+    transition: background 0.5s ease, transform 0.4s ease;
+  }
+
+  .dot.filled {
+    background: linear-gradient(135deg, #e879a8, #81c784);
+    transform: scale(1.2);
+  }
+
+  .bloom-message {
+    display: none;
+    margin-top: 2rem;
+    padding: 2.2rem 2rem;
+    background: rgba(255,255,255,0.72);
+    backdrop-filter: blur(10px);
+    border-radius: 24px;
+    border: 1px solid rgba(240, 180, 210, 0.4);
+    box-shadow: 0 8px 40px rgba(220, 140, 180, 0.2);
+    animation: bloomIn 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  .bloom-message p {
+    font-family: 'Lora', serif;
+    font-size: 1.05rem;
+    color: #6d4060;
+    line-height: 2;
+    font-style: italic;
+  }
+
+  .bloom-message .signature {
+    display: block;
+    margin-top: 1.2rem;
+    font-size: 0.95rem;
+    color: #a06080;
+    font-style: normal;
+    font-weight: 500;
+  }
+
+  .glow-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -55%);
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 200, 230, 0.6) 0%, rgba(200, 240, 210, 0.3) 50%, transparent 70%);
+    animation: pulse 2.5s ease-in-out infinite;
+    display: none;
+    z-index: 0;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes bloomIn {
+    from { opacity: 0; transform: scale(0.92) translateY(12px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: translate(-50%, -55%) scale(1); opacity: 0.7; }
+    50% { transform: translate(-50%, -55%) scale(1.15); opacity: 1; }
+  }
+
+  @keyframes growPop {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.1) rotate(-1deg); }
+    70% { transform: scale(0.97) rotate(0.5deg); }
+    100% { transform: scale(1); }
+  }
+
+  .pop { animation: growPop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+  .sparkle {
+    position: absolute;
+    pointer-events: none;
+    font-size: 1rem;
+    animation: sparkleOut 0.9s ease forwards;
+  }
+
+  @keyframes sparkleOut {
+    0% { opacity: 1; transform: scale(0.5) translateY(0); }
+    100% { opacity: 0; transform: scale(1.4) translateY(-40px); }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <div class="intro">
+    <p>Hi Suchir,<br>
+    I made something small for you…<br>
+    just open this whenever you need me.</p>
+  </div>
+
+  <div class="plant-area" id="plantArea">
+    <div class="glow-ring" id="glowRing"></div>
+    <svg class="plant-svg" id="plantSvg" viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg">
+      <!-- Stage 0: tiny sprout -->
+      <g id="stage0">
+        <line x1="100" y1="195" x2="100" y2="160" stroke="#81a86a" stroke-width="3" stroke-linecap="round"/>
+        <ellipse cx="100" cy="152" rx="9" ry="6" fill="#a8d08a" transform="rotate(-15 100 152)"/>
+        <ellipse cx="100" cy="152" rx="9" ry="6" fill="#b8dfa0" transform="rotate(15 100 152)"/>
+      </g>
+      <!-- Stage 1: small plant -->
+      <g id="stage1" style="display:none;">
+        <line x1="100" y1="195" x2="100" y2="135" stroke="#6b9455" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="100" y1="175" x2="80" y2="158" stroke="#6b9455" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="100" y1="165" x2="120" y2="150" stroke="#6b9455" stroke-width="2.5" stroke-linecap="round"/>
+        <ellipse cx="72" cy="152" rx="14" ry="9" fill="#a8d08a"/>
+        <ellipse cx="127" cy="145" rx="14" ry="9" fill="#b8dfa0"/>
+        <ellipse cx="100" cy="128" rx="12" ry="8" fill="#c4e8a4"/>
+      </g>
+      <!-- Stage 2: taller plant -->
+      <g id="stage2" style="display:none;">
+        <line x1="100" y1="195" x2="100" y2="105" stroke="#5a8444" stroke-width="4" stroke-linecap="round"/>
+        <line x1="100" y1="180" x2="70" y2="160" stroke="#5a8444" stroke-width="3" stroke-linecap="round"/>
+        <line x1="100" y1="165" x2="128" y2="148" stroke="#5a8444" stroke-width="3" stroke-linecap="round"/>
+        <line x1="100" y1="145" x2="76" y2="128" stroke="#5a8444" stroke-width="2.5" stroke-linecap="round"/>
+        <ellipse cx="60" cy="155" rx="17" ry="10" fill="#9ccf78"/>
+        <ellipse cx="138" cy="143" rx="17" ry="10" fill="#aed98a"/>
+        <ellipse cx="66" cy="120" rx="15" ry="9" fill="#b8e294"/>
+        <ellipse cx="100" cy="98" rx="13" ry="9" fill="#c8eca8"/>
+      </g>
+      <!-- Stage 3: budding -->
+      <g id="stage3" style="display:none;">
+        <line x1="100" y1="195" x2="100" y2="80" stroke="#4a7436" stroke-width="4" stroke-linecap="round"/>
+        <line x1="100" y1="178" x2="64" y2="158" stroke="#4a7436" stroke-width="3" stroke-linecap="round"/>
+        <line x1="100" y1="160" x2="134" y2="144" stroke="#4a7436" stroke-width="3" stroke-linecap="round"/>
+        <line x1="100" y1="138" x2="70" y2="120" stroke="#4a7436" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="100" y1="118" x2="126" y2="104" stroke="#4a7436" stroke-width="2.5" stroke-linecap="round"/>
+        <ellipse cx="52" cy="150" rx="18" ry="11" fill="#92c870"/>
+        <ellipse cx="145" cy="138" rx="18" ry="11" fill="#a2d882"/>
+        <ellipse cx="58" cy="113" rx="16" ry="10" fill="#b0e08c"/>
+        <ellipse cx="136" cy="98" rx="15" ry="9" fill="#bceca0"/>
+        <!-- buds -->
+        <circle cx="100" cy="72" r="10" fill="#f48fb1"/>
+        <circle cx="82" cy="78" r="7" fill="#f06292"/>
+        <circle cx="118" cy="78" r="7" fill="#f06292"/>
+        <circle cx="100" cy="72" r="5" fill="#fce4ec"/>
+      </g>
+      <!-- Stage 4: full bouquet -->
+      <g id="stage4" style="display:none;">
+        <line x1="100" y1="195" x2="100" y2="75" stroke="#3d6630" stroke-width="4.5" stroke-linecap="round"/>
+        <line x1="100" y1="178" x2="58" y2="155" stroke="#3d6630" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="100" y1="158" x2="140" y2="138" stroke="#3d6630" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="100" y1="135" x2="65" y2="115" stroke="#3d6630" stroke-width="3" stroke-linecap="round"/>
+        <line x1="100" y1="115" x2="134" y2="98" stroke="#3d6630" stroke-width="3" stroke-linecap="round"/>
+        <ellipse cx="47" cy="147" rx="20" ry="12" fill="#88c26a"/>
+        <ellipse cx="150" cy="132" rx="20" ry="12" fill="#98d07a"/>
+        <ellipse cx="53" cy="107" rx="18" ry="11" fill="#a8dc88"/>
+        <ellipse cx="144" cy="92" rx="17" ry="10" fill="#b4e894"/>
+        <!-- full flowers -->
+        <!-- center large flower -->
+        <g transform="translate(100,60)">
+          <circle cx="0" cy="0" r="20" fill="#f8bbd9"/>
+          <circle cx="0" cy="-16" r="9" fill="#f48fb1"/>
+          <circle cx="15" cy="-8" r="9" fill="#f48fb1"/>
+          <circle cx="15" cy="8" r="9" fill="#f48fb1"/>
+          <circle cx="0" cy="16" r="9" fill="#f48fb1"/>
+          <circle cx="-15" cy="8" r="9" fill="#f48fb1"/>
+          <circle cx="-15" cy="-8" r="9" fill="#f48fb1"/>
+          <circle cx="0" cy="0" r="8" fill="#ffe082"/>
+          <circle cx="0" cy="0" r="4" fill="#ffca28"/>
+        </g>
+        <!-- left flower -->
+        <g transform="translate(62,92)">
+          <circle cx="0" cy="-12" r="7" fill="#ce93d8"/>
+          <circle cx="11" cy="-6" r="7" fill="#ce93d8"/>
+          <circle cx="11" cy="6" r="7" fill="#ce93d8"/>
+          <circle cx="0" cy="12" r="7" fill="#ce93d8"/>
+          <circle cx="-11" cy="6" r="7" fill="#ce93d8"/>
+          <circle cx="-11" cy="-6" r="7" fill="#ce93d8"/>
+          <circle cx="0" cy="0" r="7" fill="#fff9c4"/>
+        </g>
+        <!-- right flower -->
+        <g transform="translate(137,80)">
+          <circle cx="0" cy="-12" r="7" fill="#ffab91"/>
+          <circle cx="11" cy="-6" r="7" fill="#ffab91"/>
+          <circle cx="11" cy="6" r="7" fill="#ffab91"/>
+          <circle cx="0" cy="12" r="7" fill="#ffab91"/>
+          <circle cx="-11" cy="6" r="7" fill="#ffab91"/>
+          <circle cx="-11" cy="-6" r="7" fill="#ffab91"/>
+          <circle cx="0" cy="0" r="7" fill="#fff9c4"/>
+        </g>
+        <!-- small accent flowers -->
+        <g transform="translate(76,118)">
+          <circle cx="0" cy="-8" r="5" fill="#80cbc4"/>
+          <circle cx="8" cy="-4" r="5" fill="#80cbc4"/>
+          <circle cx="8" cy="4" r="5" fill="#80cbc4"/>
+          <circle cx="0" cy="8" r="5" fill="#80cbc4"/>
+          <circle cx="-8" cy="4" r="5" fill="#80cbc4"/>
+          <circle cx="-8" cy="-4" r="5" fill="#80cbc4"/>
+          <circle cx="0" cy="0" r="5" fill="#fffde7"/>
+        </g>
+        <g transform="translate(126,108)">
+          <circle cx="0" cy="-8" r="5" fill="#ef9a9a"/>
+          <circle cx="8" cy="-4" r="5" fill="#ef9a9a"/>
+          <circle cx="8" cy="4" r="5" fill="#ef9a9a"/>
+          <circle cx="0" cy="8" r="5" fill="#ef9a9a"/>
+          <circle cx="-8" cy="4" r="5" fill="#ef9a9a"/>
+          <circle cx="-8" cy="-4" r="5" fill="#ef9a9a"/>
+          <circle cx="0" cy="0" r="5" fill="#fffde7"/>
+        </g>
+      </g>
+    </svg>
+    <div class="soil"></div>
+    <div class="pot"></div>
+  </div>
+
+  <div class="stage-label" id="stageLabel">a tiny beginning…</div>
+
+  <button class="grow-btn" id="growBtn" onclick="grow()">
+    <span>🌿</span> help this grow
+  </button>
+
+  <div class="progress-dots" id="dots">
+    <div class="dot" id="d0"></div>
+    <div class="dot" id="d1"></div>
+    <div class="dot" id="d2"></div>
+    <div class="dot" id="d3"></div>
+    <div class="dot" id="d4"></div>
+  </div>
+
+  <div class="bloom-message" id="bloomMsg">
+    <p>
+      I'm beyond proud of you, Suchir.<br>
+      You're doing so much better than you think.<br>
+      You've got this.<br>
+      And I'm with you—<br>
+      always, in all ways.
+    </p>
+    <span class="signature">— your Golu 🌸</span>
+  </div>
+</div>
+
+<script>
+  const stages = [
+    { id: 'stage0', label: 'a tiny beginning…' },
+    { id: 'stage1', label: 'look, it\'s growing…' },
+    { id: 'stage2', label: 'reaching for something beautiful…' },
+    { id: 'stage3', label: 'almost there, just like you…' },
+    { id: 'stage4', label: 'in full bloom 🌸' },
+  ];
+
+  let current = 0;
+
+  function loadProgress() {
+    const saved = localStorage.getItem('growWithYou_stage');
+    if (saved !== null) {
+      current = parseInt(saved, 10);
+      if (isNaN(current) || current < 0) current = 0;
+      if (current >= stages.length) current = stages.length - 1;
+    }
+    render(false);
+  }
+
+  function saveProgress() {
+    localStorage.setItem('growWithYou_stage', current);
+  }
+
+  function render(animate) {
+    stages.forEach((s, i) => {
+      const el = document.getElementById(s.id);
+      el.style.display = i === current ? 'block' : 'none';
+    });
+
+    document.getElementById('stageLabel').textContent = stages[current].label;
+
+    for (let i = 0; i < 5; i++) {
+      const dot = document.getElementById('d' + i);
+      dot.classList.toggle('filled', i <= current);
+    }
+
+    if (animate) {
+      const svg = document.getElementById('plantSvg');
+      svg.classList.remove('pop');
+      void svg.offsetWidth;
+      svg.classList.add('pop');
+    }
+
+    if (current === stages.length - 1) {
+      document.getElementById('growBtn').classList.add('hidden');
+      document.getElementById('glowRing').style.display = 'block';
+      document.getElementById('bloomMsg').style.display = 'block';
+    } else {
+      document.getElementById('growBtn').classList.remove('hidden');
+      document.getElementById('glowRing').style.display = 'none';
+      document.getElementById('bloomMsg').style.display = 'none';
+    }
+  }
+
+  function spawnSparkles() {
+    const area = document.getElementById('plantArea');
+    const emojis = ['✨', '🌸', '💚', '🌿', '💛'];
+    for (let i = 0; i < 5; i++) {
+      setTimeout(() => {
+        const s = document.createElement('div');
+        s.className = 'sparkle';
+        s.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        s.style.left = (30 + Math.random() * 140) + 'px';
+        s.style.top = (40 + Math.random() * 100) + 'px';
+        area.appendChild(s);
+        setTimeout(() => s.remove(), 900);
+      }, i * 100);
+    }
+  }
+
+  function grow() {
+    if (current < stages.length - 1) {
+      current++;
+      saveProgress();
+      render(true);
+      spawnSparkles();
+    }
+  }
+
+  loadProgress();
+</script>
+</body>
+</html>
