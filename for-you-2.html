@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>for you</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f5f2ec;
+  --text:#1a1916;
+  --muted:#8a847d;
+  --soft:#c4bfb8;
+  --line:#e0dbd2;
+  --serif:'EB Garamond',Georgia,serif;
+  --sans:'DM Sans',sans-serif;
+}
+html,body{
+  background:var(--bg);color:var(--text);
+  font-family:var(--sans);font-weight:300;
+  min-height:100vh;cursor:default;
+  user-select:none;overflow:hidden;
+}
+
+/* ─── SCREENS ─── */
+.screen{
+  position:fixed;inset:0;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:60px 40px;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.6s ease;
+}
+.screen.on{opacity:1;pointer-events:all}
+
+/* ─── PROGRESS ─── */
+#prog{
+  position:fixed;top:0;left:0;
+  height:1px;background:var(--text);
+  width:0%;transition:width 0.9s ease;
+  opacity:0.15;z-index:50;
+}
+#counter{
+  position:fixed;top:24px;right:28px;
+  font-family:var(--sans);font-size:10px;
+  color:var(--soft);letter-spacing:0.1em;
+  opacity:0;transition:opacity 0.5s;z-index:50;
+}
+#counter.on{opacity:1}
+
+/* ─── HINT ─── */
+#hint{
+  position:fixed;bottom:34px;left:50%;
+  transform:translateX(-50%);
+  font-family:var(--sans);font-size:10px;
+  color:var(--soft);letter-spacing:0.14em;
+  opacity:0;transition:opacity 0.6s;
+  pointer-events:none;z-index:50;white-space:nowrap;
+}
+#hint.on{opacity:1}
+
+/* ─── TOAST ─── */
+#toast{
+  position:fixed;top:28px;left:50%;
+  transform:translateX(-50%);
+  font-family:var(--sans);font-size:10px;
+  color:var(--muted);letter-spacing:0.16em;
+  opacity:0;transition:opacity 0.3s;
+  pointer-events:none;z-index:200;
+  white-space:nowrap;
+}
+#toast.on{opacity:1}
+
+/* ─── FAKE EXIT ─── */
+#exit{
+  position:fixed;inset:0;background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:2.5rem;
+  opacity:0;pointer-events:none;transition:opacity 0.45s;z-index:300;
+}
+#exit.on{opacity:1;pointer-events:all}
+#exit-msg{
+  font-family:var(--sans);
+  font-size:clamp(20px,3vw,28px);
+  font-weight:300;color:var(--text);
+}
+#exit-sub{
+  font-family:var(--sans);font-size:11px;
+  color:var(--muted);letter-spacing:0.08em;
+}
+#exitno{
+  font-family:var(--sans);font-size:11px;
+  color:var(--muted);letter-spacing:0.1em;
+  cursor:pointer;border:none;background:none;
+  text-decoration:underline;text-underline-offset:5px;
+  padding:0;transition:color 0.2s;
+}
+#exitno:hover{color:var(--text)}
+
+/* ─── INTRO TEXT LINES ─── */
+.il{
+  font-family:var(--sans);
+  font-size:clamp(18px,3vw,26px);
+  font-weight:300;color:var(--text);
+  opacity:0;transform:translateY(8px);
+  transition:opacity 0.55s ease,transform 0.55s ease;
+  margin-bottom:0.15rem;letter-spacing:-0.01em;
+  text-align:center;
+}
+.il.on{opacity:1;transform:translateY(0)}
+.il.muted{color:var(--muted);font-size:clamp(13px,2vw,17px)}
+.il.big{font-size:clamp(26px,4.5vw,42px);letter-spacing:-0.02em}
+
+/* ─── SETUP SCREEN ─── */
+#s-setup{gap:0.6rem;text-align:center;max-width:600px;width:100%;margin:0 auto;}
+
+/* ─── TITLE CARD (the "what is this" reveal) ─── */
+#s-title{gap:0}
+.title-eyebrow{
+  font-family:var(--sans);font-size:11px;
+  color:var(--soft);letter-spacing:0.18em;
+  opacity:0;transition:opacity 0.5s;
+  margin-bottom:1.4rem;
+}
+.title-eyebrow.on{opacity:1}
+.title-main{
+  font-family:var(--serif);
+  font-size:clamp(32px,6vw,64px);
+  font-weight:400;font-style:italic;
+  color:var(--text);letter-spacing:-0.01em;
+  line-height:1.1;
+  opacity:0;transform:translateY(12px);
+  transition:opacity 0.7s ease,transform 0.7s ease;
+}
+.title-main.on{opacity:1;transform:translateY(0)}
+.title-sub{
+  font-family:var(--sans);font-size:clamp(12px,2vw,15px);
+  font-weight:300;color:var(--muted);
+  margin-top:1.6rem;letter-spacing:0.04em;
+  opacity:0;transition:opacity 0.5s 0.3s;
+}
+.title-sub.on{opacity:1}
+
+/* ─── CHOICE SCREEN ─── */
+#s-choice{gap:0;text-align:center;max-width:600px;width:100%;margin:0 auto;}
+.choice-q{
+  font-family:var(--sans);
+  font-size:clamp(18px,3vw,26px);
+  font-weight:300;color:var(--text);
+  letter-spacing:-0.015em;
+  opacity:0;transform:translateY(8px);
+  transition:opacity 0.5s,transform 0.5s;
+  margin-bottom:2.8rem;
+}
+.choice-q.on{opacity:1;transform:translateY(0)}
+.choice-opts{
+  display:flex;gap:1rem;flex-wrap:wrap;
+  justify-content:center;
+  opacity:0;transition:opacity 0.5s 0.2s;
+}
+.choice-opts.on{opacity:1}
+.copt{
+  font-family:var(--sans);font-size:13px;
+  font-weight:300;color:var(--text);
+  background:none;border:1px solid var(--line);
+  padding:11px 22px;cursor:pointer;
+  transition:all 0.2s ease;letter-spacing:-0.01em;
+}
+.copt:hover{background:var(--text);color:var(--bg);border-color:var(--text)}
+.choice-reply{
+  font-family:var(--sans);font-size:clamp(16px,2.5vw,22px);
+  font-weight:300;color:var(--muted);
+  letter-spacing:-0.01em;
+  opacity:0;transition:opacity 0.6s;
+}
+.choice-reply.on{opacity:1}
+
+/* ─── REASON DISPLAY ─── */
+.rdisplay{max-width:680px;width:100%}
+.rnum{
+  font-family:var(--sans);font-size:10px;
+  font-weight:400;color:var(--soft);
+  letter-spacing:0.12em;margin-bottom:1.4rem;
+  opacity:0;transition:opacity 0.4s ease 0.1s;
+}
+.rnum.on{opacity:1}
+.rtxt{
+  font-family:var(--sans);
+  font-size:clamp(22px,4vw,38px);
+  font-weight:300;line-height:1.25;
+  color:var(--text);letter-spacing:-0.02em;
+  opacity:0;transform:translateY(12px);
+  transition:opacity 0.5s ease 0.15s,transform 0.5s ease 0.15s;
+}
+.rtxt.on{opacity:1;transform:translateY(0)}
+.rtxt.serif{
+  font-family:var(--serif);
+  font-size:clamp(26px,4.5vw,44px);
+  font-style:italic;letter-spacing:-0.01em;
+}
+.rtxt.dim{color:var(--muted)}
+
+/* inline choice under reason */
+.ich{
+  margin-top:3rem;
+  opacity:0;transition:opacity 0.5s 0.3s;
+}
+.ich.on{opacity:1}
+.ich-label{
+  font-family:var(--sans);font-size:11px;
+  color:var(--muted);letter-spacing:0.1em;
+  margin-bottom:1.1rem;
+}
+.ich-opts{display:flex;gap:0.9rem;flex-wrap:wrap}
+.ich-btn{
+  font-family:var(--sans);font-size:12px;
+  font-weight:300;color:var(--text);
+  background:none;border:1px solid var(--line);
+  padding:9px 18px;cursor:pointer;
+  transition:all 0.2s;letter-spacing:-0.01em;
+}
+.ich-btn:hover{background:var(--text);color:var(--bg);border-color:var(--text)}
+.ich-reply{
+  font-family:var(--sans);font-size:13px;
+  color:var(--muted);letter-spacing:0.06em;
+  opacity:0;transition:opacity 0.5s;
+}
+.ich-reply.on{opacity:1}
+
+/* ─── TRANSITION ─── */
+#s-trans{text-align:center;gap:0.6rem}
+.tl{
+  font-family:var(--sans);
+  font-size:clamp(15px,2.5vw,21px);
+  font-weight:300;color:var(--muted);
+  display:block;opacity:0;transition:opacity 0.6s ease;
+}
+.tl.on{opacity:1}
+
+/* ─── 99 ─── */
+#s-99{max-width:600px;width:100%}
+#p99{
+  font-family:var(--serif);
+  font-size:clamp(17px,2.5vw,23px);
+  line-height:1.9;color:var(--text);
+  opacity:0;transition:opacity 1s ease;
+}
+#p99.on{opacity:1}
+
+/* ─── ENDING ─── */
+#s-end{text-align:center;flex-direction:column;gap:1.2rem}
+#edate{
+  font-family:var(--serif);
+  font-size:clamp(32px,7vw,68px);
+  font-weight:400;color:var(--text);
+  letter-spacing:-0.02em;
+  opacity:0;transform:translateY(16px);
+  transition:opacity 1s ease,transform 1s ease;
+}
+#edate.on{opacity:1;transform:translateY(0)}
+#efooter{
+  font-family:var(--sans);font-size:11px;
+  color:var(--soft);letter-spacing:0.1em;
+  opacity:0;transition:opacity 1s ease 0.8s;
+}
+#efooter.on{opacity:1}
+
+@media(max-width:600px){
+  .screen{padding:50px 28px}
+  .ich-opts,.choice-opts{flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+
+<div id="prog"></div>
+<div id="counter"></div>
+<div id="hint">click anywhere to continue</div>
+<div id="toast"></div>
+
+<!-- FAKE EXIT -->
+<div id="exit">
+  <p id="exit-msg">where do you think you're going.</p>
+  <p id="exit-sub">you're not done.</p>
+  <button id="exitno">fine. keep going.</button>
+</div>
+
+<!-- ── SCREEN 0: INTRO (typed feel) ── -->
+<div class="screen" id="s-intro">
+  <div id="s-setup" style="display:flex;flex-direction:column;align-items:center;gap:0.8rem;max-width:580px;width:100%">
+    <p class="il" id="il1">hi.</p>
+    <p class="il" id="il2">i made something for you.</p>
+    <p class="il muted" id="il3">don't get ahead of yourself.</p>
+    <p class="il muted" id="il4">this took effort, so behave.</p>
+    <p class="il" id="il5" style="margin-top:1.2rem">are you ready?</p>
+  </div>
+</div>
+
+<!-- ── SCREEN 1: FAKE CHOICE (are you ready) ── -->
+<div class="screen" id="s-ready">
+  <div style="text-align:center;max-width:560px;width:100%">
+    <p class="choice-q" id="rq">are you actually ready?</p>
+    <div class="choice-opts" id="ro">
+      <button class="copt" data-a="yes">yes</button>
+      <button class="copt" data-a="no">no</button>
+      <button class="copt" data-a="idk">i don't know</button>
+    </div>
+    <p class="choice-reply" id="rr"></p>
+  </div>
+</div>
+
+<!-- ── SCREEN 2: WHAT IS THIS ── -->
+<div class="screen" id="s-title">
+  <div style="text-align:center">
+    <p class="title-eyebrow" id="teyebrow">100 reasons</p>
+    <p class="title-main" id="tmain">why you, specifically.</p>
+    <p class="title-sub" id="tsub">no skipping. no arguing. just read.</p>
+  </div>
+</div>
+
+<!-- ── SCREEN 3: RULE SET (teasing) ── -->
+<div class="screen" id="s-rules">
+  <div style="text-align:center;max-width:560px;width:100%;display:flex;flex-direction:column;align-items:center;gap:0.8rem">
+    <p class="il" id="rl1">the rules are simple.</p>
+    <p class="il muted" id="rl2">you read. you don't interrupt.</p>
+    <p class="il muted" id="rl3">you don't say "stop" in that voice.</p>
+    <p class="il muted" id="rl4">and you finish it.</p>
+    <p class="il" id="rl5" style="margin-top:1rem">okay. starting.</p>
+  </div>
+</div>
+
+<!-- ── REASONS: FAST 1–20 ── -->
+<div class="screen" id="s-fast">
+  <div class="rdisplay">
+    <div class="rnum" id="fn"></div>
+    <div class="rtxt" id="ft"></div>
+    <div class="ich" id="fc"></div>
+  </div>
+</div>
+
+<!-- ── SPEED BUMP (between 10 and 11) ── -->
+<div class="screen" id="s-bump1">
+  <div style="text-align:center;max-width:520px;width:100%;display:flex;flex-direction:column;align-items:center;gap:0.9rem">
+    <p class="choice-q" id="b1q">ten in. still here?</p>
+    <div class="choice-opts" id="b1o">
+      <button class="copt" data-a="yes">obviously</button>
+      <button class="copt" data-a="no">i mean. yeah.</button>
+    </div>
+    <p class="choice-reply" id="b1r"></p>
+  </div>
+</div>
+
+<!-- ── REASONS: COMFORT 21–40 ── -->
+<div class="screen" id="s-comfort">
+  <div class="rdisplay">
+    <div class="rnum" id="cn"></div>
+    <div class="rtxt serif" id="ct"></div>
+    <div class="ich" id="cc"></div>
+  </div>
+</div>
+
+<!-- ── SPEED BUMP 2 (between 30 and 31) ── -->
+<div class="screen" id="s-bump2">
+  <div style="text-align:center;max-width:520px;width:100%;display:flex;flex-direction:column;align-items:center;gap:0.9rem">
+    <p class="choice-q" id="b2q">okay real talk. are you smiling?</p>
+    <div class="choice-opts" id="b2o">
+      <button class="copt" data-a="yes">no</button>
+      <button class="copt" data-a="no">...maybe</button>
+      <button class="copt" data-a="stop">stop asking</button>
+    </div>
+    <p class="choice-reply" id="b2r"></p>
+  </div>
+</div>
+
+<!-- ── REASONS: DYNAMIC 41–60 ── -->
+<div class="screen" id="s-dyn">
+  <div class="rdisplay">
+    <div class="rnum" id="dn"></div>
+    <div class="rtxt" id="dt"></div>
+    <div class="ich" id="dc"></div>
+  </div>
+</div>
+
+<!-- ── SPEED BUMP 3 (fake exit attempt) ── -->
+<div class="screen" id="s-bump3">
+  <div style="text-align:center;max-width:520px;width:100%;display:flex;flex-direction:column;align-items:center;gap:0.9rem">
+    <p class="choice-q" id="b3q">halfway. you okay?</p>
+    <div class="choice-opts" id="b3o">
+      <button class="copt" data-a="yes">yes</button>
+      <button class="copt" data-a="close">i need a minute</button>
+      <button class="copt" data-a="exit">i want to leave</button>
+    </div>
+    <p class="choice-reply" id="b3r"></p>
+  </div>
+</div>
+
+<!-- ── REASONS: BANTER 61–80 ── -->
+<div class="screen" id="s-ban">
+  <div class="rdisplay">
+    <div class="rnum" id="bn"></div>
+    <div class="rtxt" id="bt"></div>
+    <div class="ich" id="bc"></div>
+  </div>
+</div>
+
+<!-- ── SPEED BUMP 4 ── -->
+<div class="screen" id="s-bump4">
+  <div style="text-align:center;max-width:520px;width:100%;display:flex;flex-direction:column;align-items:center;gap:0.9rem">
+    <p class="choice-q" id="b4q">80 down. this is almost over.</p>
+    <div class="choice-opts" id="b4o">
+      <button class="copt" data-a="a">don't say that</button>
+      <button class="copt" data-a="b">okay</button>
+    </div>
+    <p class="choice-reply" id="b4r"></p>
+  </div>
+</div>
+
+<!-- ── REASONS: SLOW 81–98 ── -->
+<div class="screen" id="s-slow">
+  <div class="rdisplay">
+    <div class="rnum" id="sn"></div>
+    <div class="rtxt serif" id="st"></div>
+  </div>
+</div>
+
+<!-- ── TRANSITION ── -->
+<div class="screen" id="s-trans">
+  <div style="text-align:center;display:flex;flex-direction:column;gap:0.7rem">
+    <span class="tl" id="tl1">okay wait</span>
+    <span class="tl" id="tl2">this one isn't funny</span>
+    <span class="tl" id="tl3" style="margin-top:0.5rem;font-size:clamp(11px,1.8vw,14px);color:var(--soft)">take your time with this one</span>
+  </div>
+</div>
+
+<!-- ── REASON 99 ── -->
+<div class="screen" id="s-99">
+  <p id="p99"></p>
+</div>
+
+<!-- ── ENDING ── -->
+<div class="screen" id="s-end">
+  <div id="edate">22.07.23</div>
+  <p id="efooter">that's it. that's the whole thing.</p>
+</div>
+
+<script>
+const R=[
+"",
+"because you somehow made me like you and now i can't undo it",
+"because you're annoying—but like MY annoying",
+"because you don't run when i'm being a moody bitch",
+"because you handle my moods like it's part of your job description",
+"because you don't run when things get real",
+"because your patience is almost saint-level tf",
+"because you make me feel safe without making it a big deal",
+"because you're ambitious as fuck",
+"because you don't make love feel complicated",
+"because you notice something's off just from my \"hi\"",
+"because you make me feel so seen",
+"because you match my energy (or at least try)",
+"because you never make me feel like i'm too much",
+"because you make me feel chosen",
+"because you stay",
+"because you make me laugh when i'm trying to stay mad",
+"because you call me your \"gold\"",
+"because you call me a hundred times when i'm pushing you away",
+"because you put your ego aside for me every single time",
+"because you actually try to understand me",
+"because you'll wake up at 3am just to talk to me",
+"because you listen to everything",
+"because you're worth missing",
+"because you feel like home—even from far away",
+"because you hype me up",
+"because you don't disappear when i'm difficult",
+"because you know when to be serious and when to be stupid",
+"because you always pick up my calls—with the cutest smile",
+"because i'll get prettier babies because of you",
+"because you make everything better",
+"because you're the first person i tell everything to",
+"because you're the last person i think about at night",
+"because you make random moments feel important",
+"because you're the mentally stable one in this relationship",
+"because you make things feel less scary",
+"because talking to you makes everything feel lighter",
+"because sometimes everything feels okay just because i'm talking to you",
+"because you reply to all my reels",
+"because you make me better",
+"because you don't make me question things",
+"because you reassure me",
+"because you get jealous in the cutest way",
+"because i get to be a punjaban bahu",
+"because you make me softer",
+"because no one else is you",
+"because i'd still choose you",
+"because you're mine",
+"because i keep choosing you",
+"because i don't get tired of you",
+"because you feel right",
+"because you make everything feel right",
+"because no matter how many times i panic about your mom not liking me",
+"you handle me gently every single time",
+"because you've learned \"i'm fine\" is a threat",
+"because you still try to figure it out anyway",
+"because you take these risks daily",
+"because you refuse to let things go",
+"because you don't say \"ok bye\"—you just stay",
+"because you cutely ask me for advice when someone asks YOU for advice",
+"because you let me be clingy without acting suffocated",
+"because you let me annoy you for entertainment",
+"because you tolerate my nonsense",
+"because no matter what i do… you're still here",
+"because you've realized peace > being right",
+"because you behave like someone who has a girlfriend",
+"because you're loyal as fuck",
+"because i don't share well so this worked out",
+"because your attention is exactly where it should be",
+"because you love me",
+"hehehehehe",
+"because you didn't fumble me",
+"because you didn't make me regret choosing you",
+"because you stayed consistent",
+"because you handled me correctly every single time",
+"because you didn't get tired of me",
+"because you didn't treat me like i was hard to love",
+"because you didn't disappoint me",
+"because i never had to second guess you",
+"you were my first",
+"and you're my forever",
+"because you deal with my overthinking like it's normal",
+"because silence with you isn't awkward",
+"because you ask \"what happened\" instead of ignoring it",
+"because you come back even when i act like i don't care",
+"because you know i do care",
+"because you don't twist my words",
+"because you protect my feelings",
+"because you don't make me feel replaceable",
+"because you're emotionally available",
+"because you don't act cold for no reason",
+"because you don't use distance as an excuse",
+"because you still show up",
+"because you don't disappear randomly",
+"because you're stable",
+"because you make things feel simple",
+"because you don't complicate love",
+"because even when we fight, i never feel like i'll lose you",
+"because no matter what's going on… you're there"
+];
+
+const P99="because you were there for me every step of the way during my drop year when everything was wrong when i was having the worst panic attacks of my life when all there was left (or at least thats how i felt like) was darkness, you were there, with a sweet smile on your face, ready for any type of nonse i laid out for u, whether it was in the middle of your classes or sleep, even if i fucked your first sem up u never blamed me for it. you are just there fir me, through it all, assuring me every step of the way. you. you are the reason i believe in love suchir, youre the reason i believe good men exist, that not every man wants something out of you, some men just want to love you, for everything that u are and will be. youre that man. i dont need any reason to love you, let alone 100. youre enough. youre it for me.";
+
+// inline reason choices
+const ICH={
+  5:{l:"pause. does he know this about himself?",opts:["he does now","doubt it"],res:["good.","well. now he does."]},
+  10:{l:"wait. be honest.",opts:["this one got you","no","...yes"],res:["thought so.","liar.","knew it."]},
+  17:{l:"the \"gold\" thing.",opts:["i know i know","it's embarrassing","it's actually cute"],res:["it's everything.","no it's not.","exactly."]},
+  29:{l:"be honest.",opts:["okay FINE","that's actually funny","moving on"],res:["thank you.","right?","we're not."]},
+  34:{l:"is this true.",opts:["unfortunately yes","no comment","this is accurate"],res:["sure jan.","right.","thank you for your honesty."]},
+  47:{l:"say it back.",opts:["you're mine","...","i need a minute"],res:["good.","yeah that's what i thought.","take it."]},
+  63:{l:"still here?",opts:["obviously","unfortunately","yes and stop"],res:["good.","love that for you.","no."]},
+  70:{l:"you laughed.",opts:["no","...maybe","shut up"],res:["liar.","yeah you did.","make me."]},
+  79:{l:"",opts:["...","okay","stop"],res:["yeah.","good.","no."]},
+  88:{l:"don't skip this one.",opts:["i'm not","okay","..."],res:["good.","good.","stay."]}
+};
+
+// toasts / interruptions
+const TOASTS=[
+  "focus","don't rush","this part matters",
+  "stay with it","keep reading","don't you dare skim"
+];
+const TOAST_AT=new Set([7,15,24,38,52,66,83,91]);
+let toastIdx=0;
+
+// ─── state ───
+let state='intro';
+let n=0;
+let waiting=false;
+let choiceOpen=false;
+let exitShown=false;
+
+// intro sub-state
+let introStep=0; // 0=playing lines, 1=waiting for click
+
+// setup phases for multi-step screens
+let setupPhase=0;
+
+function g(id){return document.getElementById(id)}
+function on(el){if(el)el.classList.add('on')}
+function off(el){if(el)el.classList.remove('on')}
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>off(s));
+  on(g(id));
+}
+
+function setProgress(nn){
+  g('prog').style.width=(nn/100*100)+'%';
+  if(nn>=1){g('counter').textContent=nn+' / 100';on(g('counter'));}
+}
+
+function showToast(txt){
+  const el=g('toast');
+  el.textContent=txt;on(el);
+  setTimeout(()=>off(el),2200);
+}
+
+function hint(show){show?on(g('hint')):off(g('hint'))}
+
+// ─── SEGMENTS ───
+const SEGS=[
+  ['s-fast',   'fn','ft','fc',false,1,20],
+  ['s-comfort','cn','ct','cc',true, 21,40],
+  ['s-dyn',    'dn','dt','dc',false,41,60],
+  ['s-ban',    'bn','bt','bc',false,61,80],
+  ['s-slow',   'sn','st',null,true, 81,98]
+];
+function getSeg(nn){return SEGS.find(s=>nn>=s[5]&&nn<=s[6])}
+
+// ─── SHOW REASON ───
+function showReason(nn){
+  const s=getSeg(nn);if(!s)return;
+  const[sid,nid,tid,cid,useSerif]=s;
+
+  showScreen(sid);
+  const numEl=g(nid),txtEl=g(tid),chEl=cid?g(cid):null;
+  off(numEl);off(txtEl);
+  if(chEl){off(chEl);chEl.innerHTML='';}
+
+  useSerif?txtEl.classList.add('serif'):txtEl.classList.remove('serif');
+  txtEl.style.color=(nn===70)?'var(--muted)':'';
+
+  numEl.textContent=nn+'.';
+  txtEl.textContent=R[nn];
+
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{on(numEl);on(txtEl);}));
+  setProgress(nn);
+
+  if(TOAST_AT.has(nn)){
+    setTimeout(()=>showToast(TOASTS[toastIdx++%TOASTS.length]),600);
+  }
+
+  // inline choice
+  if(ICH[nn]&&chEl){
+    setTimeout(()=>showInlineChoice(nn,chEl),1800);
+  } else {
+    setTimeout(()=>{hint(true);waiting=true;},750);
+  }
+}
+
+function showInlineChoice(nn,el){
+  const ch=ICH[nn];
+  el.innerHTML=`${ch.l?`<p class="ich-label">${ch.l}</p>`:''}
+    <div class="ich-opts">${ch.opts.map((o,i)=>`<button class="ich-btn" data-i="${i}">${o}</button>`).join('')}</div>
+    <p class="ich-reply" id="ichr${nn}"></p>`;
+  on(el);choiceOpen=true;
+  el.querySelectorAll('.ich-btn').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      e.stopPropagation();
+      const i=parseInt(btn.dataset.i);
+      el.querySelector('.ich-opts').style.display='none';
+      if(ch.l)el.querySelector('.ich-label').style.display='none';
+      const rp=el.querySelector('.ich-reply');
+      rp.textContent=ch.res[i];on(rp);
+      choiceOpen=false;
+      setTimeout(()=>{hint(true);waiting=true;},800);
+    });
+  });
+}
+
+// ─── BUMP SCREENS ───
+function setupBump(qid,oid,rid,answers){
+  const q=g(qid),o=g(oid),r=g(rid);
+  off(r);r.textContent='';
+  o.style.display='flex';
+  setTimeout(()=>{on(q);on(o);},200);
+  o.querySelectorAll('.copt').forEach(btn=>{
+    btn.onclick=null;
+    btn.addEventListener('click',e=>{
+      e.stopPropagation();
+      const a=btn.dataset.a;
+      if(a==='exit'){
+        // fake exit
+        on(g('exit'));
+        return;
+      }
+      o.style.display='none';off(q);
+      r.textContent=answers[a]||answers['yes']||'good.';on(r);
+      choiceOpen=false;
+      setTimeout(()=>{hint(true);waiting=true;},900);
+    });
+  });
+  choiceOpen=true;
+}
+
+// ─── READY SCREEN ───
+function setupReady(){
+  showScreen('s-ready');
+  const q=g('rq'),o=g('ro'),r=g('rr');
+  off(r);r.textContent='';o.style.display='flex';
+  setTimeout(()=>{on(q);on(o);},200);
+  o.querySelectorAll('.copt').forEach(btn=>{
+    btn.onclick=null;
+    btn.addEventListener('click',e=>{
+      e.stopPropagation();
+      const a=btn.dataset.a;
+      o.style.display='none';off(q);
+      const reps={yes:"good. that's the only right answer.",no:"you don't have a choice.",idk:"that's okay. start anyway."};
+      r.textContent=reps[a];on(r);
+      choiceOpen=false;
+      setTimeout(()=>{hint(true);waiting=true;},900);
+    });
+  });
+  choiceOpen=true;
+}
+
+// ─── TITLE SCREEN ───
+function runTitle(){
+  showScreen('s-title');
+  setTimeout(()=>on(g('teyebrow')),300);
+  setTimeout(()=>on(g('tmain')),700);
+  setTimeout(()=>on(g('tsub')),1400);
+  setTimeout(()=>{hint(true);waiting=true;},2200);
+}
+
+// ─── RULES SCREEN ───
+function runRules(){
+  showScreen('s-rules');
+  ['rl1','rl2','rl3','rl4','rl5'].forEach((id,i)=>{
+    setTimeout(()=>on(g(id)),400+i*700);
+  });
+  setTimeout(()=>{hint(true);waiting=true;},400+5*700+200);
+}
+
+// ─── TRANSITION ───
+function showTrans(){
+  showScreen('s-trans');
+  off(g('tl1'));off(g('tl2'));off(g('tl3'));
+  setTimeout(()=>on(g('tl1')),500);
+  setTimeout(()=>on(g('tl2')),1200);
+  setTimeout(()=>on(g('tl3')),2000);
+  setTimeout(()=>{hint(true);waiting=true;},2900);
+}
+
+// ─── 99 ───
+function show99(){
+  showScreen('s-99');setProgress(99);
+  g('p99').textContent=P99;
+  setTimeout(()=>{
+    on(g('p99'));
+    setTimeout(()=>{hint(true);waiting=true;},1200);
+  },400);
+}
+
+// ─── ENDING ───
+function showEnd(){
+  showScreen('s-end');setProgress(100);
+  off(g('counter'));hint(false);
+  setTimeout(()=>{on(g('edate'));on(g('efooter'));},700);
+}
+
+// ─── INTRO ───
+function runIntro(){
+  showScreen('s-intro');
+  ['il1','il2','il3','il4','il5'].forEach((id,i)=>{
+    setTimeout(()=>on(g(id)),400+i*800);
+  });
+  setTimeout(()=>{hint(true);waiting=true;},400+5*800+200);
+}
+
+// ─── ADVANCE (state machine) ───
+function advance(){
+  if(choiceOpen||!waiting)return;
+  waiting=false;hint(false);
+
+  if(state==='intro'){
+    state='ready';setupReady();return;
+  }
+  if(state==='ready'){
+    state='title';runTitle();return;
+  }
+  if(state==='title'){
+    state='rules';runRules();return;
+  }
+  if(state==='rules'){
+    state='reasons';n=1;showReason(1);return;
+  }
+  if(state==='reasons'){
+    // bump points
+    if(n===10){state='bump1';showScreen('s-bump1');
+      setupBump('b1q','b1o','b1r',{yes:'good. keep going.',no:'same thing really.'});return;}
+    if(n===20){state='bump2';showScreen('s-bump2');
+      setupBump('b2q','b2o','b2r',{yes:'i knew it.',no:'i knew it.',stop:'noted. moving on.'});return;}
+    if(n===40){state='bump3';showScreen('s-bump3');
+      setupBump('b3q','b3o','b3r',{yes:'good.',close:'you can\'t. keep going.',exit:'no.'});return;}
+    if(n===60){state='bump4';showScreen('s-bump4');
+      setupBump('b4q','b4o','b4r',{a:'okay. twenty more.',b:'too bad. twenty more.'});return;}
+    n++;
+    if(n<=98){showReason(n);}
+    else{state='trans';showTrans();}
+    return;
+  }
+  // bumps resume
+  if(state==='bump1'){state='reasons';n=11;showReason(11);return;}
+  if(state==='bump2'){state='reasons';n=21;showReason(21);return;}
+  if(state==='bump3'){state='reasons';n=41;showReason(41);return;}
+  if(state==='bump4'){state='reasons';n=61;showReason(61);return;}
+  if(state==='trans'){state='r99';show99();return;}
+  if(state==='r99'){state='end';showEnd();return;}
+}
+
+// ─── EXIT OVERLAY ───
+g('exitno').addEventListener('click',e=>{
+  e.stopPropagation();
+  off(g('exit'));
+  // resume from bump3
+  choiceOpen=false;
+  hint(true);waiting=true;
+});
+
+// ─── GLOBAL CLICK ───
+document.addEventListener('click',()=>{
+  if(g('exit').classList.contains('on'))return;
+  advance();
+});
+
+// ─── BOOT ───
+runIntro();
+</script>
+</body>
+</html>

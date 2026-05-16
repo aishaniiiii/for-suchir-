@@ -1,0 +1,2422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Sonu — A Private Universe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@200;300;400;500&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080a0f;
+  --bg2: #0d1017;
+  --bg3: #111520;
+  --surface: rgba(255,255,255,0.03);
+  --surface2: rgba(255,255,255,0.06);
+  --border: rgba(255,255,255,0.06);
+  --border2: rgba(255,255,255,0.12);
+  --text: #e8e6e0;
+  --text2: #9a9590;
+  --text3: #5a5550;
+  --gold: #c9a96e;
+  --gold2: #e8c97a;
+  --amber: #d4856a;
+  --glow: rgba(201,169,110,0.15);
+  --glow2: rgba(201,169,110,0.08);
+  --blue-glow: rgba(100,140,200,0.08);
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans: 'DM Sans', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-weight: 300;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* CUSTOM CURSOR */
+#cursor {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  background: var(--gold);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transition: transform 0.1s ease, opacity 0.3s;
+  transform: translate(-50%, -50%);
+  mix-blend-mode: screen;
+}
+#cursor-ring {
+  position: fixed;
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(201,169,110,0.4);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  transition: transform 0.15s ease, width 0.3s, height 0.3s, border-color 0.3s;
+}
+
+/* LOADING SCREEN */
+#loader {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 9000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 1s ease, visibility 1s ease;
+}
+#loader.hidden { opacity: 0; visibility: hidden; }
+.loader-text {
+  font-family: var(--serif);
+  font-size: clamp(1rem, 3vw, 1.4rem);
+  font-weight: 300;
+  color: var(--text2);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+.loader-line {
+  width: 200px;
+  height: 1px;
+  background: var(--border);
+  margin: 2rem auto;
+  position: relative;
+  overflow: hidden;
+}
+.loader-line::after {
+  content: '';
+  position: absolute;
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  animation: loaderSweep 2s ease forwards;
+}
+@keyframes loaderSweep {
+  to { width: 100%; left: 0; }
+}
+
+/* RAIN CANVAS */
+#rain-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.25;
+}
+
+/* NAV */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 1.5rem 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(to bottom, rgba(8,10,15,0.9), transparent);
+  backdrop-filter: blur(2px);
+}
+.nav-logo {
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: var(--gold);
+  letter-spacing: 0.1em;
+}
+.nav-links {
+  display: flex;
+  gap: 2.5rem;
+  list-style: none;
+}
+.nav-links a {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--text3);
+  text-decoration: none;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  transition: color 0.3s;
+}
+.nav-links a:hover { color: var(--gold); }
+
+.nav-controls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+.ctrl-btn {
+  background: none;
+  border: 1px solid var(--border2);
+  color: var(--text3);
+  padding: 0.4rem 0.9rem;
+  border-radius: 100px;
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.ctrl-btn:hover, .ctrl-btn.active {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: var(--glow2);
+}
+
+/* SECTIONS */
+section { position: relative; z-index: 2; }
+
+/* HERO */
+#hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse 60% 50% at 50% 80%, rgba(60,40,20,0.3) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 30% 40%, rgba(100,140,200,0.06) 0%, transparent 50%),
+    radial-gradient(ellipse 50% 40% at 70% 60%, rgba(201,169,110,0.05) 0%, transparent 50%);
+}
+
+.city-lights {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: 
+    radial-gradient(ellipse 20% 60% at 20% 100%, rgba(201,169,110,0.08) 0%, transparent 100%),
+    radial-gradient(ellipse 15% 40% at 45% 100%, rgba(100,140,200,0.06) 0%, transparent 100%),
+    radial-gradient(ellipse 25% 50% at 70% 100%, rgba(201,169,110,0.06) 0%, transparent 100%),
+    radial-gradient(ellipse 10% 30% at 85% 100%, rgba(200,100,80,0.04) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+.typing-container {
+  max-width: 600px;
+  margin-bottom: 4rem;
+}
+
+#typing-text {
+  font-family: var(--serif);
+  font-size: clamp(1.3rem, 3vw, 1.9rem);
+  font-weight: 300;
+  line-height: 1.9;
+  color: var(--text);
+  min-height: 12rem;
+}
+
+.typing-line { display: block; opacity: 0; transform: translateY(12px); transition: opacity 0.8s ease, transform 0.8s ease; }
+.typing-line.visible { opacity: 1; transform: translateY(0); }
+.signature {
+  font-style: italic;
+  color: var(--gold);
+  margin-top: 1rem;
+}
+
+.enter-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.2rem 3rem;
+  border: 1px solid rgba(201,169,110,0.3);
+  border-radius: 100px;
+  background: transparent;
+  color: var(--gold);
+  font-family: var(--sans);
+  font-size: 0.85rem;
+  font-weight: 300;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.5s ease;
+  opacity: 0;
+  backdrop-filter: blur(10px);
+}
+.enter-btn::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 100px;
+  background: linear-gradient(135deg, rgba(201,169,110,0.2), transparent, rgba(201,169,110,0.1));
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+.enter-btn:hover::before { opacity: 1; }
+.enter-btn.visible { opacity: 1; }
+.enter-btn:hover {
+  border-color: var(--gold);
+  box-shadow: 0 0 40px var(--glow), 0 0 80px var(--glow2);
+  transform: scale(1.02);
+}
+
+.enter-arrow { font-size: 1.2rem; transition: transform 0.3s; }
+.enter-btn:hover .enter-arrow { transform: translateX(4px); }
+
+/* LIVE STATUS BAR */
+.live-bar {
+  position: absolute;
+  bottom: 3rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 3rem;
+  align-items: center;
+}
+.live-item {
+  text-align: center;
+}
+.live-label {
+  font-family: var(--mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 0.4rem;
+}
+.live-value {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--gold);
+}
+.live-dot {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  background: var(--gold);
+  border-radius: 50%;
+  margin-right: 0.4rem;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+.live-sep {
+  width: 1px;
+  height: 40px;
+  background: var(--border2);
+}
+
+/* MAIN EXPERIENCE */
+#main {
+  display: none;
+}
+#main.visible {
+  display: block;
+}
+
+/* SECTION HEADERS */
+.section-header {
+  text-align: center;
+  padding: 8rem 2rem 4rem;
+}
+.section-tag {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 1.5rem;
+}
+.section-title {
+  font-family: var(--serif);
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-weight: 300;
+  line-height: 1.1;
+  color: var(--text);
+  margin-bottom: 1.5rem;
+}
+.section-title em { color: var(--gold); font-style: italic; }
+.section-desc {
+  font-size: 0.9rem;
+  color: var(--text2);
+  max-width: 480px;
+  margin: 0 auto;
+  line-height: 1.8;
+}
+
+/* DIVIDER */
+.divider {
+  width: 80px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  margin: 0 auto;
+}
+
+/* MEMORY ARCHIVE */
+#memory {
+  padding-bottom: 6rem;
+}
+.memory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  padding: 0 3rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.memory-card {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2rem;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  overflow: hidden;
+}
+.memory-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 2px;
+  height: 0;
+  background: var(--gold);
+  transition: height 0.4s ease;
+}
+.memory-card:hover::before { height: 100%; }
+.memory-card:hover {
+  border-color: var(--border2);
+  background: var(--surface2);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 30px var(--glow2);
+}
+.memory-id {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  color: var(--text3);
+  margin-bottom: 1rem;
+}
+.memory-title {
+  font-family: var(--serif);
+  font-size: 1.3rem;
+  font-weight: 400;
+  color: var(--text);
+  margin-bottom: 0.8rem;
+  line-height: 1.3;
+}
+.memory-preview {
+  font-size: 0.8rem;
+  color: var(--text2);
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
+}
+.memory-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.memory-date {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  color: var(--text3);
+}
+.memory-damage {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  color: var(--amber);
+  letter-spacing: 0.1em;
+}
+.memory-tag {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  font-family: var(--mono);
+  font-size: 0.5rem;
+  letter-spacing: 0.2em;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid var(--border2);
+  border-radius: 100px;
+  color: var(--text3);
+}
+
+/* MODAL */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(8,10,15,0.95);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.4s ease;
+  backdrop-filter: blur(20px);
+}
+.modal-overlay.open { opacity: 1; visibility: visible; }
+.modal {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 3rem;
+  max-width: 660px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  transform: translateY(30px) scale(0.96);
+  transition: transform 0.4s ease;
+  position: relative;
+}
+.modal-overlay.open .modal { transform: translateY(0) scale(1); }
+.modal::-webkit-scrollbar { width: 4px; }
+.modal::-webkit-scrollbar-track { background: transparent; }
+.modal::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+.modal-close {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  background: none;
+  border: 1px solid var(--border2);
+  color: var(--text2);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+.modal-close:hover { border-color: var(--gold); color: var(--gold); }
+.modal-id {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.25em;
+  color: var(--text3);
+  margin-bottom: 1.5rem;
+}
+.modal-title {
+  font-family: var(--serif);
+  font-size: 2rem;
+  font-weight: 300;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
+}
+.modal-divider {
+  width: 40px;
+  height: 1px;
+  background: var(--gold);
+  margin: 1.5rem 0;
+}
+.modal-body {
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  font-weight: 300;
+  line-height: 1.9;
+  color: var(--text2);
+}
+.modal-body em { color: var(--gold); font-style: italic; }
+.modal-note {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: var(--surface);
+  border-left: 2px solid var(--gold);
+  border-radius: 0 4px 4px 0;
+}
+.modal-note-label {
+  font-family: var(--mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.2em;
+  color: var(--text3);
+  margin-bottom: 0.8rem;
+  text-transform: uppercase;
+}
+.modal-note-text {
+  font-family: var(--serif);
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--text2);
+  line-height: 1.8;
+}
+.modal-damage {
+  margin-top: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.damage-label {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  color: var(--text3);
+  white-space: nowrap;
+}
+.damage-bar {
+  flex: 1;
+  height: 2px;
+  background: var(--border);
+  border-radius: 1px;
+  overflow: hidden;
+}
+.damage-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold), var(--amber));
+  border-radius: 1px;
+  transition: width 1s ease;
+}
+.damage-pct {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  color: var(--amber);
+}
+
+/* MISS GOLU */
+#miss {
+  padding: 0 3rem 8rem;
+}
+.miss-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4rem;
+}
+.miss-btn-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.miss-btn-glow {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, var(--glow), transparent 70%);
+  border-radius: 50%;
+  animation: breathe 4s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes breathe {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.3); opacity: 1; }
+}
+.miss-btn {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  border: 1px solid rgba(201,169,110,0.3);
+  background: var(--surface);
+  color: var(--gold);
+  font-family: var(--serif);
+  font-size: 0.95rem;
+  font-weight: 300;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  backdrop-filter: blur(10px);
+}
+.miss-btn:hover {
+  border-color: var(--gold);
+  box-shadow: 0 0 60px var(--glow), 0 0 120px var(--glow2);
+  transform: scale(1.05);
+}
+.miss-btn-icon { font-size: 1.8rem; }
+.miss-btn-text { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); }
+.miss-output {
+  max-width: 500px;
+  width: 100%;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.miss-message {
+  text-align: center;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.5s ease;
+}
+.miss-message.show { opacity: 1; transform: translateY(0); }
+.miss-message-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+.miss-message-text {
+  font-family: var(--serif);
+  font-size: 1.4rem;
+  font-weight: 300;
+  color: var(--text);
+  line-height: 1.6;
+  font-style: italic;
+}
+.miss-message-sub {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  color: var(--text3);
+  letter-spacing: 0.2em;
+  margin-top: 1rem;
+  text-transform: uppercase;
+}
+
+/* BANGALORE WEEK */
+#bangalore {
+  padding-bottom: 8rem;
+}
+.countdown-wrap {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin: 3rem 0;
+}
+.countdown-item {
+  text-align: center;
+  padding: 2rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  min-width: 100px;
+  transition: all 0.4s;
+}
+.countdown-item:hover {
+  border-color: var(--border2);
+  box-shadow: 0 0 30px var(--glow2);
+}
+.countdown-num {
+  font-family: var(--serif);
+  font-size: 3rem;
+  font-weight: 300;
+  color: var(--gold);
+  display: block;
+  line-height: 1;
+}
+.countdown-label {
+  font-family: var(--mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.25em;
+  color: var(--text3);
+  text-transform: uppercase;
+  display: block;
+  margin-top: 0.5rem;
+}
+.bangalore-timeline {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 0 3rem;
+}
+.timeline-item {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 3rem;
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: all 0.6s ease;
+}
+.timeline-item.visible { opacity: 1; transform: translateX(0); }
+.timeline-time {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--gold);
+  white-space: nowrap;
+  padding-top: 0.2rem;
+  min-width: 60px;
+}
+.timeline-line {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+.timeline-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--gold);
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 10px var(--glow);
+}
+.timeline-connector {
+  width: 1px;
+  flex: 1;
+  background: linear-gradient(to bottom, var(--gold), transparent);
+  margin-top: 4px;
+  min-height: 40px;
+}
+.timeline-content {
+  flex: 1;
+  padding-bottom: 2rem;
+}
+.timeline-title {
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  font-weight: 400;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+.timeline-desc {
+  font-size: 0.82rem;
+  color: var(--text2);
+  line-height: 1.7;
+}
+
+/* FUTURE SIMULATOR */
+#future {
+  padding-bottom: 8rem;
+}
+.future-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.5rem;
+  padding: 0 3rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.future-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2rem;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+.future-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--glow2), transparent);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.future-card:hover::after { opacity: 1; }
+.future-card:hover {
+  border-color: var(--border2);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+}
+.future-icon { font-size: 1.8rem; margin-bottom: 1.5rem; display: block; }
+.future-name {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--gold);
+  margin-bottom: 0.5rem;
+}
+.future-desc {
+  font-size: 0.8rem;
+  color: var(--text2);
+  line-height: 1.7;
+}
+.future-badge {
+  display: inline-block;
+  margin-top: 1rem;
+  font-family: var(--mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.15em;
+  padding: 0.3rem 0.7rem;
+  border: 1px solid var(--border2);
+  border-radius: 100px;
+  color: var(--text3);
+  text-transform: uppercase;
+}
+
+/* SIMULATION MODAL */
+.sim-scene {
+  text-align: center;
+}
+.sim-title {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  color: var(--text3);
+  margin-bottom: 2rem;
+  text-transform: uppercase;
+}
+.sim-narration {
+  font-family: var(--serif);
+  font-size: 1.4rem;
+  font-weight: 300;
+  font-style: italic;
+  color: var(--text);
+  line-height: 1.7;
+  margin-bottom: 3rem;
+}
+.sim-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.sim-choice {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1rem 1.5rem;
+  font-family: var(--sans);
+  font-size: 0.85rem;
+  font-weight: 300;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.3s;
+  text-align: left;
+}
+.sim-choice:hover {
+  border-color: var(--gold);
+  color: var(--text);
+  background: var(--surface2);
+  padding-left: 2rem;
+}
+.sim-result {
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  font-style: italic;
+  color: var(--gold);
+  line-height: 1.7;
+  padding: 2rem;
+  background: var(--surface);
+  border-radius: 4px;
+  display: none;
+}
+.sim-reset {
+  margin-top: 1.5rem;
+  background: none;
+  border: 1px solid var(--border2);
+  color: var(--text3);
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  padding: 0.6rem 1.5rem;
+  border-radius: 100px;
+  cursor: pointer;
+  display: none;
+  transition: all 0.3s;
+}
+.sim-reset:hover { border-color: var(--gold); color: var(--gold); }
+
+/* SECRET 11 MONTHS */
+#secret {
+  padding-bottom: 8rem;
+}
+.classified-header {
+  text-align: center;
+  padding: 2rem;
+  margin: 2rem auto 4rem;
+  max-width: 600px;
+}
+.classified-stamp {
+  display: inline-block;
+  border: 3px solid rgba(201,169,110,0.3);
+  color: rgba(201,169,110,0.4);
+  font-family: var(--mono);
+  font-size: 1.5rem;
+  letter-spacing: 0.4em;
+  padding: 0.5rem 2rem;
+  transform: rotate(-2deg);
+  margin-bottom: 2rem;
+  text-transform: uppercase;
+}
+.mission-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  padding: 0 3rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.mission-file {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2rem;
+  position: relative;
+  transition: all 0.4s ease;
+}
+.mission-file:hover {
+  border-color: var(--border2);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+}
+.file-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+.file-num {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  color: var(--text3);
+  letter-spacing: 0.2em;
+}
+.file-status {
+  font-family: var(--mono);
+  font-size: 0.5rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 100px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+.file-status.redacted {
+  background: rgba(100,100,100,0.1);
+  border: 1px solid rgba(100,100,100,0.2);
+  color: #555;
+}
+.file-status.classified {
+  background: rgba(201,100,50,0.1);
+  border: 1px solid rgba(201,100,50,0.2);
+  color: rgba(201,100,50,0.7);
+}
+.file-status.archived {
+  background: rgba(100,160,100,0.1);
+  border: 1px solid rgba(100,160,100,0.2);
+  color: rgba(100,160,100,0.7);
+}
+.file-title {
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  color: var(--text);
+  margin-bottom: 1rem;
+  line-height: 1.3;
+}
+.file-body {
+  font-size: 0.8rem;
+  color: var(--text2);
+  line-height: 1.8;
+}
+.file-body .redact {
+  background: var(--text3);
+  color: transparent;
+  border-radius: 2px;
+  padding: 0 4px;
+  user-select: none;
+}
+.file-body .reveal {
+  color: var(--gold);
+  font-style: italic;
+}
+.mission-note {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  color: var(--text3);
+  margin-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+  letter-spacing: 0.1em;
+}
+
+/* LOOK AT YOU */
+#pride {
+  padding-bottom: 8rem;
+}
+.achievement-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.5rem;
+  padding: 0 3rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.achievement {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+.achievement::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.achievement:hover::before { opacity: 1; }
+.achievement:hover {
+  border-color: var(--border2);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 40px var(--glow2);
+}
+.achievement-icon { font-size: 2.5rem; margin-bottom: 1.5rem; display: block; }
+.achievement-title {
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: var(--text);
+  margin-bottom: 0.8rem;
+}
+.achievement-desc {
+  font-size: 0.78rem;
+  color: var(--text2);
+  line-height: 1.7;
+}
+.achievement-unlocked {
+  margin-top: 1.5rem;
+  font-family: var(--mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.2em;
+  color: var(--gold);
+  text-transform: uppercase;
+}
+
+/* LOVE NOTES */
+#notes {
+  padding-bottom: 10rem;
+}
+.notes-container {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 0 3rem;
+}
+.note-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 3rem;
+  margin-bottom: 2rem;
+  position: relative;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s ease;
+}
+.note-card.visible { opacity: 1; transform: translateY(0); }
+.note-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0.5;
+}
+.note-unlock {
+  font-family: var(--mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.25em;
+  color: var(--text3);
+  text-transform: uppercase;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+.note-unlock::before {
+  content: '';
+  display: inline-block;
+  width: 20px;
+  height: 1px;
+  background: var(--gold);
+}
+.note-greeting {
+  font-family: var(--serif);
+  font-size: 0.9rem;
+  color: var(--gold);
+  font-style: italic;
+  margin-bottom: 1rem;
+}
+.note-body {
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  font-weight: 300;
+  line-height: 1.9;
+  color: var(--text2);
+}
+.note-sign {
+  margin-top: 2rem;
+  font-family: var(--serif);
+  font-size: 1rem;
+  font-style: italic;
+  color: var(--gold);
+  text-align: right;
+}
+
+/* SCROLL REVEAL */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.scroll-reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* MUSIC PLAYER */
+#music-player {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+.music-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(8,10,15,0.8);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 0.5rem 1rem;
+  backdrop-filter: blur(10px);
+}
+.music-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 14px;
+}
+.music-bar {
+  width: 2px;
+  background: var(--gold);
+  border-radius: 1px;
+  animation: musicBar 1.2s ease-in-out infinite;
+}
+.music-bar:nth-child(2) { animation-delay: 0.2s; }
+.music-bar:nth-child(3) { animation-delay: 0.4s; }
+.music-bar:nth-child(4) { animation-delay: 0.1s; }
+@keyframes musicBar {
+  0%, 100% { height: 3px; }
+  50% { height: 14px; }
+}
+.music-bars.paused .music-bar { animation-play-state: paused; }
+.music-label {
+  font-family: var(--mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.15em;
+  color: var(--text3);
+  text-transform: uppercase;
+}
+
+/* PARTICLES */
+.particle {
+  position: fixed;
+  pointer-events: none;
+  border-radius: 50%;
+  z-index: 1;
+}
+
+/* SCROLL INDICATOR */
+.scroll-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  position: absolute;
+  bottom: 7rem;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: scrollFloat 2s ease-in-out infinite;
+}
+@keyframes scrollFloat {
+  0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.6; }
+  50% { transform: translateX(-50%) translateY(8px); opacity: 1; }
+}
+.scroll-indicator-line {
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(to bottom, var(--gold), transparent);
+}
+.scroll-indicator-text {
+  font-family: var(--mono);
+  font-size: 0.5rem;
+  letter-spacing: 0.3em;
+  color: var(--text3);
+  text-transform: uppercase;
+}
+
+/* AMBIENT GLOW BLOBS */
+.glow-blob {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(80px);
+  opacity: 0.15;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  nav { padding: 1rem 1.5rem; }
+  .nav-links { display: none; }
+  .memory-grid, .mission-grid, .achievement-grid, .future-grid { padding: 0 1.5rem; }
+  .bangalore-timeline { padding: 0 1.5rem; }
+  .notes-container { padding: 0 1.5rem; }
+  .countdown-wrap { gap: 0.8rem; flex-wrap: wrap; justify-content: center; }
+  .countdown-item { min-width: 80px; padding: 1.5rem; }
+  .countdown-num { font-size: 2.2rem; }
+  .live-bar { gap: 1.5rem; }
+  .modal { padding: 2rem 1.5rem; }
+}
+
+/* EASTER EGG */
+.konami-flash {
+  position: fixed;
+  inset: 0;
+  background: var(--gold);
+  opacity: 0;
+  z-index: 8000;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+.konami-flash.flash { opacity: 0.15; }
+</style>
+</head>
+<body>
+
+<!-- Custom Cursor -->
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- Rain Canvas -->
+<canvas id="rain-canvas"></canvas>
+
+<!-- Ambient Glow Blobs -->
+<div class="glow-blob" style="width:600px;height:600px;background:radial-gradient(circle,#c9a96e,transparent);top:-200px;left:-200px;animation:blobMove1 20s ease-in-out infinite;"></div>
+<div class="glow-blob" style="width:500px;height:500px;background:radial-gradient(circle,#648cc8,transparent);bottom:-100px;right:-100px;animation:blobMove2 25s ease-in-out infinite;"></div>
+
+<style>
+@keyframes blobMove1 {
+  0%,100%{transform:translate(0,0) scale(1);}
+  50%{transform:translate(100px,80px) scale(1.2);}
+}
+@keyframes blobMove2 {
+  0%,100%{transform:translate(0,0) scale(1);}
+  50%{transform:translate(-80px,-60px) scale(1.15);}
+}
+</style>
+
+<!-- Loader -->
+<div id="loader">
+  <div class="loader-text">Initialising your universe</div>
+  <div class="loader-line"></div>
+  <div class="loader-text" style="font-size:0.7rem;letter-spacing:0.4em;opacity:0.4;">PROJECT SONU</div>
+</div>
+
+<!-- Navigation -->
+<nav id="nav" style="opacity:0;transition:opacity 0.8s ease;">
+  <div class="nav-logo">✦ Project Sonu</div>
+  <ul class="nav-links">
+    <li><a href="#memory">Archive</a></li>
+    <li><a href="#miss">Miss Me</a></li>
+    <li><a href="#bangalore">Bangalore</a></li>
+    <li><a href="#future">Future</a></li>
+    <li><a href="#secret">Classified</a></li>
+    <li><a href="#pride">Look at You</a></li>
+    <li><a href="#notes">Notes</a></li>
+  </ul>
+  <div class="nav-controls">
+    <button class="ctrl-btn" id="rain-toggle">Rain ◌</button>
+    <button class="ctrl-btn" id="music-toggle">Ambient ♪</button>
+  </div>
+</nav>
+
+<!-- HERO SECTION -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="city-lights"></div>
+
+  <div class="typing-container scroll-reveal" style="opacity:1;transform:none;">
+    <div id="typing-text">
+      <span class="typing-line" id="line0">Hey Sonu.</span>
+      <span class="typing-line" id="line1">You worked your ass off.</span>
+      <span class="typing-line" id="line2">Atlassian didn't just happen.</span>
+      <span class="typing-line" id="line3">I hope you know how proud I am of you.</span>
+      <span class="typing-line" id="line4">This is your place now.</span>
+      <span class="typing-line signature" id="line5">— Golu</span>
+    </div>
+  </div>
+
+  <button class="enter-btn" id="enter-btn" onclick="enterUniverse()">
+    <span>Enter Our Universe</span>
+    <span class="enter-arrow">→</span>
+  </button>
+
+  <div class="scroll-indicator">
+    <div class="scroll-indicator-line"></div>
+    <div class="scroll-indicator-text">scroll</div>
+  </div>
+
+  <div class="live-bar">
+    <div class="live-item">
+      <div class="live-label">Delhi — Golu</div>
+      <div class="live-value"><span class="live-dot"></span><span id="delhi-time">--:--</span></div>
+    </div>
+    <div class="live-sep"></div>
+    <div class="live-item">
+      <div class="live-label">Distance</div>
+      <div class="live-value">2,156 km</div>
+    </div>
+    <div class="live-sep"></div>
+    <div class="live-item">
+      <div class="live-label">Bangalore — Sonu</div>
+      <div class="live-value"><span class="live-dot"></span><span id="blr-time">--:--</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- MAIN EXPERIENCE -->
+<div id="main">
+
+<!-- MEMORY ARCHIVE -->
+<section id="memory">
+  <div class="section-header scroll-reveal">
+    <div class="section-tag">FILE_ARCHIVE // MEMORY_VAULT</div>
+    <h2 class="section-title">The Archive of <em>Us</em></h2>
+    <p class="section-desc">Every moment, encrypted and stored. Some things are too precious to forget. Some things are too embarrassing to ever delete.</p>
+    <div class="divider" style="margin-top:2rem;"></div>
+  </div>
+  <div class="memory-grid">
+
+    <div class="memory-card scroll-reveal" onclick="openMemory(0)">
+      <div class="memory-tag">PHYSICAL</div>
+      <div class="memory-id">FILE_001 // CLASSIFIED</div>
+      <div class="memory-title">The Staircase Incident</div>
+      <div class="memory-preview">It was supposed to be a quick goodbye. You had class. I had places to be. Neither of us moved for a while.</div>
+      <div class="memory-meta">
+        <div class="memory-date">~Month 03</div>
+        <div class="memory-damage">💥 97% damage</div>
+      </div>
+    </div>
+
+    <div class="memory-card scroll-reveal" onclick="openMemory(1)">
+      <div class="memory-tag">STEALTH</div>
+      <div class="memory-id">FILE_002 // ARCHIVED</div>
+      <div class="memory-title">Pretending to be Friends</div>
+      <div class="memory-preview">11 months. We held hands under tables and called each other "just friends" with completely straight faces. Academy Award material, honestly.</div>
+      <div class="memory-meta">
+        <div class="memory-date">Month 01–11</div>
+        <div class="memory-damage">🎭 99% comedy</div>
+      </div>
+    </div>
+
+    <div class="memory-card scroll-reveal" onclick="openMemory(2)">
+      <div class="memory-tag">CINEMA</div>
+      <div class="memory-id">FILE_003 // CLASSIFIED</div>
+      <div class="memory-title">Movie Theatre Crimes</div>
+      <div class="memory-preview">We definitely did not watch that movie. We definitely cannot tell anyone what we were doing instead. No ragrets.</div>
+      <div class="memory-meta">
+        <div class="memory-date">~Month 06</div>
+        <div class="memory-damage">🎬 Not safe for public</div>
+      </div>
+    </div>
+
+    <div class="memory-card scroll-reveal" onclick="openMemory(3)">
+      <div class="memory-tag">ATHLETIC</div>
+      <div class="memory-id">FILE_004 // GOLDEN</div>
+      <div class="memory-title">Post-Squash Clubhouse</div>
+      <div class="memory-preview">You were sweaty and slightly out of breath and somehow the most attractive person I had ever seen. Science cannot explain this. I don't want it to.</div>
+      <div class="memory-meta">
+        <div class="memory-date">Recurring</div>
+        <div class="memory-damage">❤️ 100% domestic</div>
+      </div>
+    </div>
+
+    <div class="memory-card scroll-reveal" onclick="openMemory(4)">
+      <div class="memory-tag">MILESTONE</div>
+      <div class="memory-id">FILE_021 // LEGENDARY</div>
+      <div class="memory-title">The Atlassian Email</div>
+      <div class="memory-preview">The day you opened that email. I watched your face do that thing where you don't let yourself feel things immediately. Then you smiled. That's the one.</div>
+      <div class="memory-meta">
+        <div class="memory-date">Recent</div>
+        <div class="memory-damage">🏆 Unmeasurable pride</div>
+      </div>
+    </div>
+
+    <div class="memory-card scroll-reveal" onclick="openMemory(5)">
+      <div class="memory-tag">SOFT</div>
+      <div class="memory-id">FILE_007 // PERSONAL</div>
+      <div class="memory-title">The Time You Just Listened</div>
+      <div class="memory-preview">I was mid-rant. Probably not even making sense. You didn't try to fix it. You just stayed. I noticed. I always notice.</div>
+      <div class="memory-meta">
+        <div class="memory-date">Multiple instances</div>
+        <div class="memory-damage">🫧 Quietly devastating</div>
+      </div>
+    </div>
+
+    <div class="memory-card scroll-reveal" onclick="openMemory(6)">
+      <div class="memory-tag">LATE NIGHT</div>
+      <div class="memory-id">FILE_014 // WARM</div>
+      <div class="memory-title">3am Random Calls</div>
+      <div class="memory-preview">No agenda. Just your voice. Just saying nothing particularly important for a very long time. The best kind of nothing.</div>
+      <div class="memory-meta">
+        <div class="memory-date">Ongoing archive</div>
+        <div class="memory-damage">🌙 Illegal levels of comfort</div>
+      </div>
+    </div>
+
+    <div class="memory-card scroll-reveal" onclick="openMemory(7)">
+      <div class="memory-tag">FIRST</div>
+      <div class="memory-id">FILE_000 // ORIGIN</div>
+      <div class="memory-title">Before Everything</div>
+      <div class="memory-preview">When I first realised I was in trouble. You were just talking. About something completely ordinary. And I thought — oh no. Oh no no no.</div>
+      <div class="memory-meta">
+        <div class="memory-date">The beginning</div>
+        <div class="memory-damage">⚡ The point of no return</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- MISS GOLU BUTTON -->
+<section id="miss">
+  <div class="section-header scroll-reveal">
+    <div class="section-tag">EMERGENCY PROTOCOL // WHEN MISSING IS TOO MUCH</div>
+    <h2 class="section-title">Miss <em>Golu</em>?</h2>
+    <p class="section-desc">Press the button. No questions asked. No judgment. I left some things here for you.</p>
+    <div class="divider" style="margin-top:2rem;"></div>
+  </div>
+  <div class="miss-center">
+    <div class="miss-btn-wrap">
+      <div class="miss-btn-glow"></div>
+      <button class="miss-btn" onclick="missGolu()">
+        <span class="miss-btn-icon">✦</span>
+        <span>Press me</span>
+        <span class="miss-btn-text">Sonu</span>
+      </button>
+    </div>
+    <div class="miss-output">
+      <div class="miss-message" id="miss-output">
+        <div class="miss-message-icon" id="miss-icon">✦</div>
+        <div class="miss-message-text" id="miss-text"></div>
+        <div class="miss-message-sub" id="miss-sub"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BANGALORE WEEK -->
+<section id="bangalore">
+  <div class="section-header scroll-reveal">
+    <div class="section-tag">COUNTDOWN // THE ONLY WEEK THAT MATTERS</div>
+    <h2 class="section-title">The <em>Bangalore</em> Week</h2>
+    <p class="section-desc">One week. Seven days. 168 hours. Every single minute already planned in my head a thousand times.</p>
+    <div class="divider" style="margin-top:2rem;"></div>
+  </div>
+
+  <div class="countdown-wrap scroll-reveal" id="countdown-display">
+    <div class="countdown-item">
+      <span class="countdown-num" id="cd-days">--</span>
+      <span class="countdown-label">Days</span>
+    </div>
+    <div class="countdown-item">
+      <span class="countdown-num" id="cd-hours">--</span>
+      <span class="countdown-label">Hours</span>
+    </div>
+    <div class="countdown-item">
+      <span class="countdown-num" id="cd-mins">--</span>
+      <span class="countdown-label">Minutes</span>
+    </div>
+    <div class="countdown-item">
+      <span class="countdown-num" id="cd-secs">--</span>
+      <span class="countdown-label">Seconds</span>
+    </div>
+  </div>
+
+  <div class="bangalore-timeline" id="blr-timeline">
+    <div class="timeline-item scroll-reveal">
+      <div class="timeline-time">Day 1</div>
+      <div class="timeline-line"><div class="timeline-dot"></div><div class="timeline-connector"></div></div>
+      <div class="timeline-content">
+        <div class="timeline-title">Landing & the First Hug</div>
+        <div class="timeline-desc">Flight from Delhi. The long corridor at the airport. Finding you before you find me. That specific look on your face. Checkpoint one: complete.</div>
+      </div>
+    </div>
+    <div class="timeline-item scroll-reveal">
+      <div class="timeline-time">Day 2</div>
+      <div class="timeline-line"><div class="timeline-dot"></div><div class="timeline-connector"></div></div>
+      <div class="timeline-content">
+        <div class="timeline-title">Bangalore Rain</div>
+        <div class="timeline-desc">It always rains in Bangalore. We will stand somewhere and let it happen. Maybe get soaked. Definitely complain. Definitely not leave.</div>
+      </div>
+    </div>
+    <div class="timeline-item scroll-reveal">
+      <div class="timeline-time">Day 3</div>
+      <div class="timeline-line"><div class="timeline-dot"></div><div class="timeline-connector"></div></div>
+      <div class="timeline-content">
+        <div class="timeline-title">The Walk Around Your Neighbourhood</div>
+        <div class="timeline-desc">I want to know where you get your chai. Which route you walk. What you see every day without me. I want all of your ordinary.</div>
+      </div>
+    </div>
+    <div class="timeline-item scroll-reveal">
+      <div class="timeline-time">Day 4</div>
+      <div class="timeline-line"><div class="timeline-dot"></div><div class="timeline-connector"></div></div>
+      <div class="timeline-content">
+        <div class="timeline-title">Lazy Afternoon Nothing</div>
+        <div class="timeline-desc">No plan. Just being in the same room. You on your laptop. Me reading. The specific peace of not needing to perform anything for each other.</div>
+      </div>
+    </div>
+    <div class="timeline-item scroll-reveal">
+      <div class="timeline-time">Day 5</div>
+      <div class="timeline-line"><div class="timeline-dot"></div><div class="timeline-connector"></div></div>
+      <div class="timeline-content">
+        <div class="timeline-title">Your First Atlassian Week Debrief</div>
+        <div class="timeline-desc">I want every detail. The annoying Slack channels. The canteen food. What your desk looks like. Who sits near you. All of it. You owe me.</div>
+      </div>
+    </div>
+    <div class="timeline-item scroll-reveal">
+      <div class="timeline-time">Day 6</div>
+      <div class="timeline-line"><div class="timeline-dot"></div><div class="timeline-connector"></div></div>
+      <div class="timeline-content">
+        <div class="timeline-title">The Dinner We Cook Together</div>
+        <div class="timeline-desc">It will go slightly wrong. One of us will burn something. We will be very proud of it anyway. It will taste like the best thing either of us has ever had.</div>
+      </div>
+    </div>
+    <div class="timeline-item scroll-reveal">
+      <div class="timeline-time">Day 7</div>
+      <div class="timeline-line"><div class="timeline-dot"></div><div class="timeline-connector"></div></div>
+      <div class="timeline-content">
+        <div class="timeline-title">Last Morning — Making it Last</div>
+        <div class="timeline-desc">We will probably not talk much. Just be very present. Coffee. Sunlight. You. I will memorise everything so it lasts until the next time.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FUTURE SIMULATOR -->
+<section id="future">
+  <div class="section-header scroll-reveal">
+    <div class="section-tag">SIMULATION ENGINE // PREVIEW MODE</div>
+    <h2 class="section-title">Future <em>Simulator</em></h2>
+    <p class="section-desc">Loading possible versions of later. Pick a file. Play it out. Let yourself imagine it.</p>
+    <div class="divider" style="margin-top:2rem;"></div>
+  </div>
+  <div class="future-grid">
+
+    <div class="future-card scroll-reveal" onclick="openSim(0)">
+      <span class="future-icon">🏠</span>
+      <div class="future-name">Apartment.exe</div>
+      <div class="future-desc">Somewhere between Bangalore and a dream. One place. Both of us. The absolute chaos and peace of it.</div>
+      <span class="future-badge">Interactive</span>
+    </div>
+
+    <div class="future-card scroll-reveal" onclick="openSim(1)">
+      <span class="future-icon">☕</span>
+      <div class="future-name">SundayMorning.routine</div>
+      <div class="future-desc">No alarms. No schedules. Just two people and too much coffee and the specific quality of Sunday light.</div>
+      <span class="future-badge">Interactive</span>
+    </div>
+
+    <div class="future-card scroll-reveal" onclick="openSim(2)">
+      <span class="future-icon">🛒</span>
+      <div class="future-name">GroceryShoppingDLC</div>
+      <div class="future-desc">The most domestic thing imaginable. Somehow also very romantic. Somehow we'd argue about which pasta to get for 20 minutes.</div>
+      <span class="future-badge">Interactive</span>
+    </div>
+
+    <div class="future-card scroll-reveal" onclick="openSim(3)">
+      <span class="future-icon">🌧️</span>
+      <div class="future-name">BangaloreRain.together</div>
+      <div class="future-desc">Rain on the window. Nowhere to be. The city doing its thing outside while we do absolutely nothing inside.</div>
+      <span class="future-badge">Interactive</span>
+    </div>
+
+    <div class="future-card scroll-reveal" onclick="openSim(4)">
+      <span class="future-icon">🐾</span>
+      <div class="future-name">FutureDogProtocol.v1</div>
+      <div class="future-desc">The dog we haven't decided on yet. The name we will argue about. The dog who will love you more than me and I will be devastated.</div>
+      <span class="future-badge">Interactive</span>
+    </div>
+
+    <div class="future-card scroll-reveal" onclick="openSim(5)">
+      <span class="future-icon">📅</span>
+      <div class="future-name">AfterTenYears.log</div>
+      <div class="future-desc">An impossible preview. Just a theory. A version of later that I find myself thinking about more than I should.</div>
+      <span class="future-badge">Speculative</span>
+    </div>
+
+  </div>
+</section>
+
+<!-- SECRET 11 MONTHS -->
+<section id="secret">
+  <div class="section-header scroll-reveal">
+    <div class="section-tag">CLASSIFIED // OPERATION STEALTH ROMANCE</div>
+    <h2 class="section-title">The Secret <em>11 Months</em></h2>
+    <p class="section-desc">Before it was official. When it was just us knowing and everyone else not knowing and it being somehow the most electric thing in the world.</p>
+    <div class="divider" style="margin-top:2rem;"></div>
+  </div>
+  <div class="classified-header scroll-reveal">
+    <div class="classified-stamp">Classified</div>
+  </div>
+  <div class="mission-grid">
+
+    <div class="mission-file scroll-reveal">
+      <div class="file-header">
+        <div class="file-num">MISSION LOG #001</div>
+        <div class="file-status classified">CLASSIFIED</div>
+      </div>
+      <div class="file-title">Codename: "We're Just Friends"</div>
+      <div class="file-body">
+        Subjects maintained cover story for <span class="reveal">11 months, 3 weeks, 2 days</span>. 
+        Protocol involved <span class="redact">physical contact concealment</span> in social settings. 
+        Mission success rate: <span class="reveal">surprisingly high</span>. 
+        Number of people who actually believed us: <span class="reveal">probably zero.</span>
+      </div>
+      <div class="mission-note">◈ INTERNAL NOTE: "just friends" do not look at each other like that</div>
+    </div>
+
+    <div class="mission-file scroll-reveal">
+      <div class="file-header">
+        <div class="file-num">MISSION LOG #004</div>
+        <div class="file-status redacted">REDACTED</div>
+      </div>
+      <div class="file-title">Close Call Protocol Activation</div>
+      <div class="file-body">
+        Date: <span class="redact">██████</span>. Subjects were <span class="redact">in a compromising position</span> when <span class="redact">██████████</span> entered the room. 
+        Recovery time: <span class="reveal">approximately 0.3 seconds</span>. 
+        Excuse deployed: <span class="reveal">"I was showing him something on my phone."</span> 
+        Credibility rating: <span class="redact">very low</span>.
+      </div>
+      <div class="mission-note">◈ CLOSE CALL RATING: Significant</div>
+    </div>
+
+    <div class="mission-file scroll-reveal">
+      <div class="file-header">
+        <div class="file-num">MISSION LOG #007</div>
+        <div class="file-status archived">ARCHIVED</div>
+      </div>
+      <div class="file-title">The Secret Signal System</div>
+      <div class="file-body">
+        Subjects developed non-verbal communication system over 11 months. 
+        Signals included: <span class="reveal">specific eye contact duration</span>, <span class="reveal">accidental-on-purpose proximity</span>, 
+        <span class="reveal">texting immediately after being in the same room</span>. 
+        System was apparently <span class="reveal">extremely obvious to external observers</span>.
+      </div>
+      <div class="mission-note">◈ ANALYSIS: Everyone knew. Everyone was just polite.</div>
+    </div>
+
+    <div class="mission-file scroll-reveal">
+      <div class="file-header">
+        <div class="file-num">MISSION LOG #011</div>
+        <div class="file-status classified">CLASSIFIED</div>
+      </div>
+      <div class="file-title">Plausible Deniability Failures</div>
+      <div class="file-body">
+        Documented instances where cover was nearly compromised: 
+        The <span class="reveal">staircase situation</span> (ref: FILE_001). 
+        The <span class="reveal">movie theatre situation</span> (ref: FILE_003). 
+        The time <span class="reveal">someone saw us and we just stared at them</span>. 
+        Recovery method: <span class="reveal">boldly pretend nothing happened</span>. 
+        Effectiveness: <span class="redact">debatable</span>.
+      </div>
+      <div class="mission-note">◈ RECOMMENDATION: Do not go into espionage as career.</div>
+    </div>
+
+    <div class="mission-file scroll-reveal">
+      <div class="file-header">
+        <div class="file-num">MISSION LOG #009</div>
+        <div class="file-status archived">ARCHIVED</div>
+      </div>
+      <div class="file-title">Why We Waited</div>
+      <div class="file-body">
+        The 11 months weren't a mistake. They were <span class="reveal">proof of concept</span>. 
+        Evidence that we liked each other before we had to. 
+        Before it was official. Before anyone knew. 
+        When it was just <span class="reveal">you and me choosing this quietly</span>, every single day. 
+        That's actually kind of everything.
+      </div>
+      <div class="mission-note">◈ STATUS: The best part of the story.</div>
+    </div>
+
+    <div class="mission-file scroll-reveal">
+      <div class="file-header">
+        <div class="file-num">MISSION LOG #013</div>
+        <div class="file-status archived">ARCHIVED</div>
+      </div>
+      <div class="file-title">The Day the Mission Changed</div>
+      <div class="file-body">
+        The exact moment stealth mode was officially deactivated. 
+        What you said. How you said it. 
+        The <span class="reveal">very specific exhale</span> I did when I realized this was actually happening. 
+        From that point forward: <span class="reveal">no more cover stories</span>. 
+        New mission: <span class="reveal">just being together</span>. 
+        Difficulty rating: <span class="reveal">infinitely better</span>.
+      </div>
+      <div class="mission-note">◈ MISSION COMPLETE: We made it official. Finally.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- LOOK AT YOU -->
+<section id="pride">
+  <div class="section-header scroll-reveal">
+    <div class="section-tag">RECOGNITION // YOU SHOULD KNOW THIS</div>
+    <h2 class="section-title">Look at <em>You</em></h2>
+    <p class="section-desc">A list. Not complete. Not even close. But somewhere to start.</p>
+    <div class="divider" style="margin-top:2rem;"></div>
+  </div>
+  <div class="achievement-grid">
+
+    <div class="achievement scroll-reveal">
+      <span class="achievement-icon">◈</span>
+      <div class="achievement-title">Got into Atlassian</div>
+      <div class="achievement-desc">Not luck. Not a fluke. You earned this with months of work that most people never see. I saw it.</div>
+      <div class="achievement-unlocked">✦ Unlocked — Legendary Tier</div>
+    </div>
+
+    <div class="achievement scroll-reveal">
+      <span class="achievement-icon">◈</span>
+      <div class="achievement-title">Survived the Hard Months</div>
+      <div class="achievement-desc">The stretch where nothing felt certain and you kept going anyway. Quiet resilience is the most underrated kind.</div>
+      <div class="achievement-unlocked">✦ Unlocked — Rare</div>
+    </div>
+
+    <div class="achievement scroll-reveal">
+      <span class="achievement-icon">◈</span>
+      <div class="achievement-title">Never Gave Up on Us</div>
+      <div class="achievement-desc">Even with distance, even with hard weeks, even when it would have been easier not to. You always showed up.</div>
+      <div class="achievement-unlocked">✦ Unlocked — Personal</div>
+    </div>
+
+    <div class="achievement scroll-reveal">
+      <span class="achievement-icon">◈</span>
+      <div class="achievement-title">Made Golu Proud</div>
+      <div class="achievement-desc">Multiple times. In ways you didn't even know you were doing it. Just by being exactly who you are.</div>
+      <div class="achievement-unlocked">✦ Unlocked — Always</div>
+    </div>
+
+    <div class="achievement scroll-reveal">
+      <span class="achievement-icon">◈</span>
+      <div class="achievement-title">Loved Quietly and Deeply</div>
+      <div class="achievement-desc">Not the loud kind. The kind that shows up in details. Remembering things. Checking in. Staying.</div>
+      <div class="achievement-unlocked">✦ Unlocked — Ongoing</div>
+    </div>
+
+    <div class="achievement scroll-reveal">
+      <span class="achievement-icon">◈</span>
+      <div class="achievement-title">Kept Going When Tired</div>
+      <div class="achievement-desc">This one especially. The days when the effort was invisible and you still chose to keep moving. That counts enormously.</div>
+      <div class="achievement-unlocked">✦ Unlocked — Every time</div>
+    </div>
+
+    <div class="achievement scroll-reveal">
+      <span class="achievement-icon">◈</span>
+      <div class="achievement-title">Became Someone to Admire</div>
+      <div class="achievement-desc">Not because of Atlassian. Not because of any single thing. Because of the accumulation of everything you've quietly built yourself into.</div>
+      <div class="achievement-unlocked">✦ Unlocked — Lifetime</div>
+    </div>
+
+    <div class="achievement scroll-reveal">
+      <span class="achievement-icon">◈</span>
+      <div class="achievement-title">Made the Distance Smaller</div>
+      <div class="achievement-desc">2,156 km and somehow still very present. That's not nothing. That's actually everything.</div>
+      <div class="achievement-unlocked">✦ Unlocked — Right now</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- LOVE NOTES -->
+<section id="notes">
+  <div class="section-header scroll-reveal">
+    <div class="section-tag">SCHEDULED DELIVERY // OPEN WHEN NEEDED</div>
+    <h2 class="section-title">Notes for <em>Hard Days</em></h2>
+    <p class="section-desc">Written for whenever. No expiry date. Read one. Read all of them. Come back whenever.</p>
+    <div class="divider" style="margin-top:2rem;"></div>
+  </div>
+  <div class="notes-container">
+
+    <div class="note-card scroll-reveal">
+      <div class="note-unlock">Unlocked — for whenever work is too much</div>
+      <div class="note-greeting">Hi Sonu.</div>
+      <div class="note-body">
+        I know work is killing you right now. I know some days feel like you're running just to stay in place and it's exhausting in a way that's hard to explain to people who aren't inside it.<br><br>
+        But younger you — the one who was grinding before any of this was guaranteed — would be insanely proud of where you ended up. Atlassian. An actual salary. Your own city. Your own space. That version of you could never have imagined this moment.<br><br>
+        You did that. Not luck. You.
+      </div>
+      <div class="note-sign">— Golu, who is unreasonably proud of you</div>
+    </div>
+
+    <div class="note-card scroll-reveal">
+      <div class="note-unlock">Unlocked — for when you miss me and won't say it</div>
+      <div class="note-greeting">Sonu.</div>
+      <div class="note-body">
+        You don't have to say it. I already know. The way you text at odd hours. The "you up?" messages that aren't really asking about sleep.<br><br>
+        I miss you too. All the time. In a way that's become so constant it's almost comfortable — like background noise I've just learned to live with.<br><br>
+        But here's the thing. This distance is temporary. The missing is real but it's also proof of something. You don't miss what doesn't matter.
+      </div>
+      <div class="note-sign">— Golu, also missing her idiot</div>
+    </div>
+
+    <div class="note-card scroll-reveal">
+      <div class="note-unlock">Unlocked — for 3am when you can't sleep</div>
+      <div class="note-greeting">Hey.</div>
+      <div class="note-body">
+        It's late. You should be sleeping. I know. But if your brain won't stop — if it's doing that thing where it replays everything and evaluates and worries — I want you to know that from where I'm standing, you are doing extraordinarily well.<br><br>
+        Drink some water. Put your phone face down. The work will be there tomorrow. You are enough for it.<br><br>
+        Sleep, idiot. I'll be here in the morning too.
+      </div>
+      <div class="note-sign">— Golu (go to sleep)</div>
+    </div>
+
+    <div class="note-card scroll-reveal">
+      <div class="note-unlock">Unlocked — for a day you feel proud of yourself</div>
+      <div class="note-greeting">Look at you.</div>
+      <div class="note-body">
+        Did something go right today? Did you do a thing that felt hard and then did it anyway? Did someone tell you that you did well?<br><br>
+        You're allowed to feel good about it. Not just briefly and then immediately move on to the next thing. Actually feel it. Sit in it for a minute.<br><br>
+        I have been watching you become someone genuinely impressive and I don't say it enough. Today I'm saying it. You're impressive, Sonu. Actually.
+      </div>
+      <div class="note-sign">— Golu, your least objective admirer</div>
+    </div>
+
+    <div class="note-card scroll-reveal">
+      <div class="note-unlock">Unlocked — for when you need to remember why</div>
+      <div class="note-greeting">Here's why.</div>
+      <div class="note-body">
+        Three years of this. Almost. The sneaky phase where we held hands under tables and pretended to everyone else. The staircase. The movies. The long calls. The hard patches. The reunion week we have in Bangalore.<br><br>
+        Every single part of it has been worth it. Not just the good parts. All of it.<br><br>
+        We are an unusually good story, Sonu. I thought you should know.
+      </div>
+      <div class="note-sign">— Golu, very much still here</div>
+    </div>
+
+  </div>
+</section>
+
+</div> <!-- end #main -->
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal-content">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-id" id="modal-id"></div>
+    <div class="modal-title" id="modal-title"></div>
+    <div class="modal-divider"></div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-note" id="modal-note">
+      <div class="modal-note-label">Golu's Note</div>
+      <div class="modal-note-text" id="modal-note-text"></div>
+    </div>
+    <div class="modal-damage" id="modal-damage-wrap">
+      <div class="damage-label" id="modal-damage-label"></div>
+      <div class="damage-bar"><div class="damage-fill" id="modal-damage-fill"></div></div>
+      <div class="damage-pct" id="modal-damage-pct"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SIMULATION MODAL -->
+<div class="modal-overlay" id="sim-overlay" onclick="closeSim(event)">
+  <div class="modal" id="sim-content">
+    <button class="modal-close" onclick="closeSim()">✕</button>
+    <div class="sim-scene" id="sim-scene"></div>
+  </div>
+</div>
+
+<!-- Music Indicator -->
+<div id="music-player">
+  <div class="music-indicator">
+    <div class="music-bars paused" id="music-bars">
+      <div class="music-bar"></div>
+      <div class="music-bar"></div>
+      <div class="music-bar"></div>
+      <div class="music-bar"></div>
+    </div>
+    <span class="music-label" id="music-label">Ambient Off</span>
+  </div>
+</div>
+
+<!-- Konami easter egg flash -->
+<div class="konami-flash" id="konami-flash"></div>
+
+<script>
+// ============================================
+// CURSOR
+// ============================================
+const cursor = document.getElementById('cursor');
+const cursorRing = document.getElementById('cursor-ring');
+let mx = -100, my = -100, rx = -100, ry = -100;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+function updateCursor() {
+  cursor.style.left = mx + 'px';
+  cursor.style.top = my + 'px';
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) * 0.12;
+  cursorRing.style.left = rx + 'px';
+  cursorRing.style.top = ry + 'px';
+  requestAnimationFrame(updateCursor);
+}
+updateCursor();
+document.querySelectorAll('button, a, .memory-card, .future-card, .mission-file, .achievement').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    cursorRing.style.width = '50px';
+    cursorRing.style.height = '50px';
+    cursorRing.style.borderColor = 'rgba(201,169,110,0.6)';
+    cursor.style.transform = 'translate(-50%,-50%) scale(1.5)';
+  });
+  el.addEventListener('mouseleave', () => {
+    cursorRing.style.width = '32px';
+    cursorRing.style.height = '32px';
+    cursorRing.style.borderColor = 'rgba(201,169,110,0.4)';
+    cursor.style.transform = 'translate(-50%,-50%) scale(1)';
+  });
+});
+
+// ============================================
+// RAIN
+// ============================================
+const canvas = document.getElementById('rain-canvas');
+const ctx = canvas.getContext('2d');
+let rainActive = true;
+let drops = [];
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+function initRain() {
+  drops = [];
+  for (let i = 0; i < 140; i++) {
+    drops.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      len: Math.random() * 18 + 6,
+      speed: Math.random() * 3 + 2,
+      opacity: Math.random() * 0.4 + 0.1,
+      width: Math.random() * 0.8 + 0.3
+    });
+  }
+}
+initRain();
+
+function drawRain() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (!rainActive) { requestAnimationFrame(drawRain); return; }
+  drops.forEach(d => {
+    ctx.beginPath();
+    ctx.moveTo(d.x, d.y);
+    ctx.lineTo(d.x - d.len * 0.15, d.y + d.len);
+    ctx.strokeStyle = `rgba(180,200,220,${d.opacity})`;
+    ctx.lineWidth = d.width;
+    ctx.stroke();
+    d.y += d.speed;
+    d.x -= d.speed * 0.1;
+    if (d.y > canvas.height) {
+      d.y = -d.len;
+      d.x = Math.random() * canvas.width;
+    }
+  });
+  requestAnimationFrame(drawRain);
+}
+drawRain();
+
+document.getElementById('rain-toggle').addEventListener('click', function() {
+  rainActive = !rainActive;
+  this.classList.toggle('active', rainActive);
+  this.textContent = rainActive ? 'Rain ◉' : 'Rain ◌';
+});
+
+// ============================================
+// LOADER & HERO SEQUENCE
+// ============================================
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('loader').classList.add('hidden');
+    document.getElementById('nav').style.opacity = '1';
+    startTyping();
+  }, 2200);
+});
+
+const lines = ['line0','line1','line2','line3','line4','line5'];
+function startTyping() {
+  lines.forEach((id, i) => {
+    setTimeout(() => {
+      document.getElementById(id).classList.add('visible');
+      if (i === lines.length - 1) {
+        setTimeout(() => {
+          document.getElementById('enter-btn').classList.add('visible');
+        }, 800);
+      }
+    }, i * 900 + 400);
+  });
+}
+
+function enterUniverse() {
+  document.getElementById('hero').style.opacity = '0';
+  document.getElementById('hero').style.transition = 'opacity 1.2s ease';
+  setTimeout(() => {
+    document.getElementById('hero').style.display = 'none';
+    document.getElementById('main').classList.add('visible');
+    initScrollReveal();
+    startCountdown();
+    updateTimes();
+    setInterval(updateTimes, 1000);
+    setInterval(updateCountdown, 1000);
+  }, 1200);
+}
+
+// ============================================
+// TIMES
+// ============================================
+function updateTimes() {
+  const now = new Date();
+  const ist = new Intl.DateTimeFormat('en-IN', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Asia/Kolkata' }).format(now);
+  document.getElementById('delhi-time').textContent = ist;
+  document.getElementById('blr-time').textContent = ist;
+}
+
+// ============================================
+// COUNTDOWN (to next June 15 as placeholder trip date)
+// ============================================
+function updateCountdown() {
+  const now = new Date();
+  const year = now.getFullYear();
+  let target = new Date(year, 5, 15, 0, 0, 0); // June 15
+  if (now > target) target = new Date(year + 1, 5, 15, 0, 0, 0);
+  const diff = target - now;
+  const d = Math.floor(diff / 86400000);
+  const h = Math.floor((diff % 86400000) / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+  document.getElementById('cd-days').textContent = String(d).padStart(2,'0');
+  document.getElementById('cd-hours').textContent = String(h).padStart(2,'0');
+  document.getElementById('cd-mins').textContent = String(m).padStart(2,'0');
+  document.getElementById('cd-secs').textContent = String(s).padStart(2,'0');
+}
+function startCountdown() { updateCountdown(); }
+
+// ============================================
+// SCROLL REVEAL
+// ============================================
+function initScrollReveal() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.scroll-reveal, .timeline-item, .note-card').forEach(el => observer.observe(el));
+}
+
+// ============================================
+// MEMORY DATA
+// ============================================
+const memories = [
+  {
+    id: 'FILE_001 // CLASSIFIED',
+    title: 'The Staircase Incident',
+    body: `It was supposed to be a quick goodbye. You had somewhere to be. I had somewhere to be. We were standing at the bottom of the stairs and neither of us was actually leaving.<br><br>
+I think one of us made an excuse. Something about a bag or a phone. And then we were not in a hallway anymore. We were in our own small world for exactly as long as we had before someone might notice.<br><br>
+The thing I remember most is not what happened. It's the moment just after — the two of us looking at each other with that specific expression that says <em>we are doing a very bad job of pretending to be friends.</em><br><br>
+We were terrible at the whole secret thing, honestly. I don't regret a single second.`,
+    note: `You looked simultaneously panicked and completely unbothered. It was a very specific look that I have thought about more times than I'll ever tell you.`,
+    damage: 97
+  },
+  {
+    id: 'FILE_002 // ARCHIVED',
+    title: 'Pretending to Be Friends',
+    body: `Eleven months. We looked people in the eye and said "just friends." We sat at tables with other people and we were <em>so normal</em> and so perfectly behaved and I would kick your foot under the table and you would not react at all.<br><br>
+You were better at it than me. You have a very good resting neutral face. I have been told I am more readable. This was a liability during this period.<br><br>
+The funniest part is looking back now and realising that absolutely everyone around us already knew. They were just being polite. They watched us perform this entire charade for nearly a year and said nothing.<br><br>
+Honestly? Iconic of them. Iconic of us.`,
+    note: `I used to text you immediately after we were in the same room as other people. Like a debrief. "Did that seem normal?" It did not seem normal. It never seemed normal.`,
+    damage: 99
+  },
+  {
+    id: 'FILE_003 // CLASSIFIED',
+    title: 'Movie Theatre Crimes',
+    body: `We bought tickets to that movie. We genuinely intended to watch it. This is documented.<br><br>
+What is not documented is what we were actually doing for the majority of its runtime. The film, to this day, remains something I have never seen. I have absolutely no idea what happened in it. If asked, I would have to guess.<br><br>
+What I do know is that the armrest between us became completely irrelevant. What I know is that popcorn was not the primary concern of either party. What I know is that we walked out of that theatre having technically attended a movie and practically done something else entirely.<br><br>
+<em>No ragrets. Not even one letter.</em>`,
+    note: `Someone asked me later if the movie was good. I said yes. I have no idea. I gave a very specific and convincing review of a film I did not watch. I have never told you this until now.`,
+    damage: 88
+  },
+  {
+    id: 'FILE_004 // GOLDEN',
+    title: 'Post-Squash Clubhouse',
+    body: `You were sweaty and slightly out of breath and your hair was doing that thing it does when you've been running around and I was supposed to be unaffected by this and I was not.<br><br>
+There is something extremely unfair about finding someone more attractive when they have literally just been doing physical exercise. It defies logic. I have thought about this.<br><br>
+The clubhouse was quiet after. That specific end-of-game peace where nobody has anywhere urgent to be. You'd say something ordinary. I'd listen like it was important. Because for some reason, everything you said in those moments felt important.<br><br>
+<em>This is one of the memories I will keep the longest.</em>`,
+    note: `You always looked cutest after squash. I'm just stating facts. You were physically better looking when slightly exhausted. This is your burden to bear.`,
+    damage: 94
+  },
+  {
+    id: 'FILE_021 // LEGENDARY',
+    title: 'The Atlassian Email',
+    body: `I watched you open it. I don't think you knew I was watching as closely as I was.<br><br>
+You do this thing when you get good news — you don't immediately let yourself feel it. Like your face gets very still for one second, processing, before it allows itself to react. That second is my favourite part. That's the real you deciding it's allowed to be happy.<br><br>
+And then you smiled. The kind that reaches your eyes first. And I thought — there it is. After everything. All the preparation and the late nights and the self-doubt you would sometimes briefly let me see — there it is.<br><br>
+<em>Atlassian didn't just happen. You happened to Atlassian.</em> I hope you understand the difference.`,
+    note: `I cried a little when you told me. Kept it very professional. Did not let you see. You would have teased me mercilessly and you would have been right to. I was absolutely crying.`,
+    damage: 100
+  },
+  {
+    id: 'FILE_007 // PERSONAL',
+    title: 'The Time You Just Listened',
+    body: `I was mid-rant about something — I don't even fully remember what. Probably work. Probably something that felt enormous in the moment and looks smaller now. I wasn't being particularly coherent.<br><br>
+And you didn't try to fix it. You didn't offer solutions. You didn't redirect. You just stayed, and occasionally said "yeah" in exactly the right place, and let me talk until I ran out of things to say.<br><br>
+This is an underrated skill. Most people want to help by solving. You understood in that moment that the help was just in staying.<br><br>
+<em>I noticed. I always notice these things about you, even when I don't say them out loud.</em>`,
+    note: `I don't say thank you enough for the small things. This was not small. This is me saying thank you now.`,
+    damage: 91
+  },
+  {
+    id: 'FILE_014 // WARM',
+    title: '3am Random Calls',
+    body: `No agenda. No particular reason. Just: "you up?" — which is never really a question about whether I'm awake.<br><br>
+These calls are some of my favourite things. We talk about nothing in particular and everything that's actually on our minds and it blurs together until an hour has passed and I'm not sure what we even covered but I feel completely better.<br><br>
+Your voice at 3am has a different quality than during the day. Softer. Less performed. More you.<br><br>
+<em>These are the conversations I reach for on bad nights.</em> The ones I replay when the distance feels the most like distance.`,
+    note: `I save your voice messages. I play them sometimes when I miss you and won't say so. You don't need to say anything about this. Just know that it exists.`,
+    damage: 96
+  },
+  {
+    id: 'FILE_000 // ORIGIN',
+    title: 'Before Everything',
+    body: `The specific moment. The one where I realised this was not casual, this was not going to stay casual, and that I was going to have to do something about how I felt or live with it silently.<br><br>
+You were just talking. About something completely ordinary. Not trying to be interesting. Not performing. Just you being you, not for anyone's benefit, just existing — and I thought: <em>oh no.</em><br><br>
+The point of no return arrives so quietly. You don't get a warning. You're just in the middle of an ordinary moment and then you're on the other side of a line you can't uncross and you think — okay. Okay then. I guess this is what's happening now.<br><br>
+<em>That was the beginning. And the beginning was very, very good.</em>`,
+    note: `I have never told you the exact moment. Now you know. You were just talking. You didn't even do anything impressive. That's the part that's funny to me.`,
+    damage: 100
+  }
+];
+
+function openMemory(idx) {
+  const m = memories[idx];
+  document.getElementById('modal-id').textContent = m.id;
+  document.getElementById('modal-title').textContent = m.title;
+  document.getElementById('modal-body').innerHTML = m.body;
+  document.getElementById('modal-note-text').textContent = m.note;
+  document.getElementById('modal-damage-label').textContent = `Sonu emotional damage level`;
+  document.getElementById('modal-damage-pct').textContent = m.damage + '%';
+  document.getElementById('modal-overlay').classList.add('open');
+  setTimeout(() => {
+    document.getElementById('modal-damage-fill').style.width = m.damage + '%';
+  }, 400);
+}
+
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('modal-overlay') || e.target.classList.contains('modal-close')) {
+    document.getElementById('modal-overlay').classList.remove('open');
+    document.getElementById('modal-damage-fill').style.width = '0%';
+  }
+}
+
+// ============================================
+// MISS GOLU
+// ============================================
+const missMessages = [
+  { icon: '💧', text: 'drink some water, idiot.', sub: 'HYDRATION PROTOCOL ACTIVATED' },
+  { icon: '🌙', text: 'sleep. it\'s too late to be reading this.', sub: 'REST REQUIRED — URGENT' },
+  { icon: '✦', text: 'I love you. Just so you know. Again.', sub: 'DAILY REMINDER' },
+  { icon: '🫶', text: 'I miss your hands.', sub: 'CLASSIFIED INFORMATION' },
+  { icon: '🏸', text: 'you looked the cutest after squash. I stand by this.', sub: 'DOCUMENTED FACT' },
+  { icon: '☕', text: 'go make yourself something warm. I\'d make it for you if I could.', sub: 'DOMESTIC PROTOCOL' },
+  { icon: '◈', text: 'Atlassian got lucky, Sonu. Not the other way around.', sub: 'FACTS ONLY' },
+  { icon: '🌧️', text: 'I\'m thinking about Bangalore. About you in the rain. About the week.', sub: 'INCOMING MEMORY' },
+  { icon: '🎯', text: 'you are doing so much better than you think.', sub: 'RECALIBRATION REQUIRED' },
+  { icon: '🤍', text: 'not missing you would require a fundamental personality change that I\'m not willing to make.', sub: 'PERSONAL STATEMENT' },
+  { icon: '📱', text: 'text me when you see this. Just "hi." I\'ll know.', sub: 'OPEN CHANNEL' },
+  { icon: '✦', text: 'you\'re my favourite person. In case you forgot.', sub: 'UNDENIABLE' },
+  { icon: '🧠', text: 'eat something. Real food. Not just chai.', sub: 'NUTRITIONAL ADVISORY' },
+  { icon: '💬', text: 'whatever you\'re worried about — you\'ve handled harder. I\'ve watched you.', sub: 'HISTORICAL DATA' },
+  { icon: '🌅', text: 'tomorrow will be okay. And if it isn\'t — call me.', sub: 'EMERGENCY PROTOCOL' }
+];
+let lastMissIdx = -1;
+function missGolu() {
+  const output = document.getElementById('miss-output');
+  output.classList.remove('show');
+  setTimeout(() => {
+    let idx;
+    do { idx = Math.floor(Math.random() * missMessages.length); } while (idx === lastMissIdx);
+    lastMissIdx = idx;
+    const msg = missMessages[idx];
+    document.getElementById('miss-icon').textContent = msg.icon;
+    document.getElementById('miss-text').textContent = msg.text;
+    document.getElementById('miss-sub').textContent = msg.sub;
+    output.classList.add('show');
+  }, 300);
+}
+
+// ============================================
+// FUTURE SIMULATOR
+// ============================================
+const sims = [
+  {
+    name: 'Apartment.exe',
+    narration: 'It\'s your apartment. Our apartment. In some version of later.\n\nYou wake up first. The room is quiet. Morning light through curtains you picked together.',
+    choices: [
+      { text: 'Make coffee before she wakes up', result: 'She wakes up to the smell of coffee and that specific domesticity of it makes her feel like the luckiest person alive. You will never know how much this particular thing gets her.' },
+      { text: 'Wake her up anyway', result: 'She is extremely unimpressed. She buries her face in the pillow. You say her name four times. On the fifth time she grabs your hand and doesn\'t let go. You count this as a win.' },
+      { text: 'Lie there and not move because she looks too peaceful', result: 'You stay very still for 20 minutes watching the room get lighter. This is the most content you have felt in a long time. You file this feeling away carefully.' }
+    ]
+  },
+  {
+    name: 'SundayMorning.routine',
+    narration: 'No alarms. No plans. It\'s Sunday in the apartment.\n\nShe\'s reading something. You\'ve been trying to work but mostly you\'ve been watching her read.',
+    choices: [
+      { text: 'Ask what she\'s reading', result: 'She explains it with that specific focused expression that becomes a 25-minute conversation that goes completely off-track. You both forget what she was reading. Neither of you minds.' },
+      { text: 'Steal her blanket', result: 'She notices immediately. The negotiation that follows is complex and unresolved. You share. Barely. There are terms.' },
+      { text: 'Suggest ordering food', result: '"Finally," she says, even though you have been awake for 30 minutes. You order too much. You eat all of it. This is the ideal Sunday.' }
+    ]
+  },
+  {
+    name: 'GroceryShoppingDLC',
+    narration: 'The supermarket. Saturday afternoon.\n\nYou\'ve been standing in the pasta aisle for eight minutes. There are many types of pasta. This has become serious.',
+    choices: [
+      { text: 'Pick the pasta she likes', result: 'She didn\'t ask for this. She notices immediately. She says nothing but she picks up your hand in the next aisle. Cause and effect.' },
+      { text: 'Suggest the wrong pasta', result: 'An educational conversation follows. You learn more about pasta than you expected. You get the right pasta. You both feel you\'ve achieved something.' },
+      { text: 'Let her decide', result: 'She puts back the first one, considers three others, goes back to the first one. You watch this with love and no judgment. You get penne. It was always going to be penne.' }
+    ]
+  },
+  {
+    name: 'BangaloreRain.together',
+    narration: 'Rain on the window. The city going grey and soft outside.\n\nYou\'re inside. There\'s nowhere you need to be.',
+    choices: [
+      { text: 'Stand at the window and watch it', result: 'She comes to stand next to you. You don\'t say anything. The rain keeps going. This is exactly enough.' },
+      { text: 'Make hot chai and bring it to her', result: 'She wraps both hands around the mug and looks at you with that expression. You sit together and listen to the rain until it stops. The city smells like petrichor after.' },
+      { text: 'Suggest going out in it', result: 'She says no. Then yes. Then no. Then you\'re both outside getting rained on and she\'s laughing at something and you think — I would do anything to keep seeing this specific laugh.' }
+    ]
+  },
+  {
+    name: 'FutureDogProtocol.v1',
+    narration: 'The dog. The one we\'ve been theoretically arguing about for months.\n\nHe\'s finally here. He\'s very small. He immediately chooses sides.',
+    choices: [
+      { text: 'He runs to you', result: 'She pretends to be unbothered. She is extremely bothered. She spends the next two hours winning the dog back through systematic bribery. It works. The dog, like all of us, can be bought with snacks.' },
+      { text: 'He runs to her', result: 'Inevitable. You saw this coming. She looks at you with pure triumph. The dog has chosen. You accept this. You love the dog anyway. You love her for loving the dog this much.' },
+      { text: 'He runs to no one and eats a slipper', result: 'You both watch this happen. Neither of you can be angry. He looks very pleased with himself. He is already your entire world.' }
+    ]
+  },
+  {
+    name: 'AfterTenYears.log',
+    narration: 'Ten years in.\n\nThe apartment knows you both by now. The coffee order is automatic. The Sunday routine is a ritual.',
+    choices: [
+      { text: 'What changed', result: 'Everything and nothing. You got older. The relationship got easier. You learned each other so well that silence became its own language. You still make each other laugh. That part never changed.' },
+      { text: 'What stayed', result: 'She still reads with that focused expression. You still watch her. The morning coffee. The pasta arguments. The specific peace of being in the same room without needing to perform anything for each other.' },
+      { text: 'The best part', result: 'Somewhere along the way it became impossible to imagine a different version of your life. Not in a trapped way. In the way that feels like: this is exactly where I was supposed to be. That feeling doesn\'t go away.' }
+    ]
+  }
+];
+
+function openSim(idx) {
+  const sim = sims[idx];
+  renderSimScene(sim, 0);
+  document.getElementById('sim-overlay').classList.add('open');
+}
+
+function renderSimScene(sim, state, choiceIdx) {
+  const container = document.getElementById('sim-scene');
+  if (state === 0) {
+    container.innerHTML = `
+      <div class="sim-title">${sim.name}</div>
+      <div class="sim-narration">${sim.narration.replace(/\n/g,'<br>')}</div>
+      <div class="sim-choices">
+        ${sim.choices.map((c,i) => `<button class="sim-choice" onclick="simChoice(${JSON.stringify(sim).replace(/"/g,'&quot;')}, ${i})">${c.text}</button>`).join('')}
+      </div>`;
+  } else {
+    container.innerHTML = `
+      <div class="sim-title">${sim.name}</div>
+      <div class="sim-result" style="display:block">${sim.choices[choiceIdx].result}</div>
+      <button class="sim-reset" style="display:inline-block" onclick="renderSimScene(${JSON.stringify(sim).replace(/"/g,'&quot;')}, 0)">Try again ↺</button>`;
+  }
+}
+
+function simChoice(sim, idx) {
+  renderSimScene(sim, 1, idx);
+}
+
+function closeSim(e) {
+  if (!e || e.target === document.getElementById('sim-overlay') || e.target.classList.contains('modal-close')) {
+    document.getElementById('sim-overlay').classList.remove('open');
+  }
+}
+
+// ============================================
+// AMBIENT TOGGLE (visual only)
+// ============================================
+let ambientOn = false;
+document.getElementById('music-toggle').addEventListener('click', function() {
+  ambientOn = !ambientOn;
+  this.classList.toggle('active', ambientOn);
+  this.textContent = ambientOn ? 'Ambient ◉' : 'Ambient ♪';
+  const bars = document.getElementById('music-bars');
+  const label = document.getElementById('music-label');
+  if (ambientOn) {
+    bars.classList.remove('paused');
+    label.textContent = 'Rain Ambient';
+  } else {
+    bars.classList.add('paused');
+    label.textContent = 'Ambient Off';
+  }
+});
+
+// ============================================
+// KONAMI CODE EASTER EGG
+// ============================================
+const konamiCode = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+let konamiPos = 0;
+document.addEventListener('keydown', e => {
+  if (e.key === konamiCode[konamiPos]) {
+    konamiPos++;
+    if (konamiPos === konamiCode.length) {
+      konamiPos = 0;
+      const flash = document.getElementById('konami-flash');
+      flash.classList.add('flash');
+      setTimeout(() => flash.classList.remove('flash'), 500);
+      setTimeout(() => {
+        alert('🌟 You found the secret.\n\nHi Sonu. This is a love letter and also an operating system and also a memory vault and also just me saying: I\'m very, very glad you exist.\n\n— Golu');
+      }, 600);
+    }
+  } else {
+    konamiPos = e.key === konamiCode[0] ? 1 : 0;
+  }
+});
+
+// Key press: press 'g' to trigger golu message
+document.addEventListener('keydown', e => {
+  if (e.key === 'g' && document.getElementById('main').classList.contains('visible')) {
+    missGolu();
+    document.getElementById('miss').scrollIntoView({ behavior: 'smooth' });
+  }
+});
+
+// Timeline animation on scroll
+window.addEventListener('scroll', () => {
+  document.querySelectorAll('.timeline-item').forEach(el => {
+    if (el.getBoundingClientRect().top < window.innerHeight * 0.85) {
+      el.classList.add('visible');
+    }
+  });
+});
+
+// Prevent sim JSON parsing issues — simChoice uses data attributes instead
+document.addEventListener('click', e => {
+  if (e.target.classList.contains('sim-choice')) {
+    // handled inline
+  }
+});
+</script>
+</body>
+</html>
