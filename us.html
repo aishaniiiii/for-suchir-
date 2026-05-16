@@ -1,0 +1,1649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>us. — a.&s.</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Serif+Display:ital@0;1&family=Instrument+Sans:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --rose: #c9a0a0;
+  --rose-light: #f0e0e0;
+  --rose-pale: #faf3f3;
+  --lavender: #b8afc8;
+  --lavender-light: #e8e4f0;
+  --cream: #f7f0e6;
+  --cream-dark: #e8ddd0;
+  --rain: #8aa4b8;
+  --rain-light: #c4d4df;
+  --sage: #9aac98;
+  --sage-light: #d4ddd3;
+  --brown: #8c7264;
+  --brown-light: #c4b0a4;
+  --lamp: #f0c060;
+  --lamp-warm: #f8e4a0;
+  --fog: #d4b8c0;
+  --night: #1a1520;
+  --night-mid: #241d2c;
+  --night-light: #2e2540;
+  --text-primary: #2c2030;
+  --text-soft: #6b5060;
+  --text-muted: #9a8090;
+  --text-ghost: #c4b0b8;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--night);
+  color: var(--cream);
+  font-family: 'Instrument Sans', sans-serif;
+  font-weight: 300;
+  overflow-x: hidden;
+  cursor: default;
+}
+
+.grain { display: none; }
+
+/* RAIN CANVAS */
+#rain-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.15;
+}
+
+/* FLOATING PARTICLES */
+.particle {
+  position: fixed;
+  width: 2px; height: 2px;
+  background: var(--lamp-warm);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 2;
+  animation: float-particle linear infinite;
+  opacity: 0;
+}
+@keyframes float-particle {
+  0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+  10% { opacity: 0.6; }
+  90% { opacity: 0.3; }
+  100% { transform: translateY(-10vh) translateX(20px); opacity: 0; }
+}
+
+/* LANDING / ENTRY SCREEN */
+#entry {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 8000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--night);
+  transition: opacity 1.5s ease, visibility 1.5s ease;
+}
+#entry.hidden { opacity: 0; visibility: hidden; }
+
+.entry-ambient {
+  position: absolute;
+  top: 30%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(201,160,160,0.06) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: pulse-glow 4s ease-in-out infinite;
+}
+@keyframes pulse-glow {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+  50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+}
+
+.entry-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(3.5rem, 10vw, 7rem);
+  font-style: italic;
+  color: var(--rose-light);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  opacity: 0;
+  animation: fade-rise 2s ease forwards 0.5s;
+}
+.entry-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+  font-style: italic;
+  color: var(--text-ghost);
+  letter-spacing: 0.2em;
+  text-align: center;
+  margin-top: 1rem;
+  position: relative;
+  z-index: 1;
+  opacity: 0;
+  animation: fade-rise 2s ease forwards 1.5s;
+}
+.entry-prompt {
+  font-size: 0.75rem;
+  color: var(--text-ghost);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  margin-top: 3rem;
+  opacity: 0;
+  animation: fade-rise 2s ease forwards 2.5s;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(196,176,184,0.3);
+  padding-bottom: 2px;
+  transition: color 0.3s, border-color 0.3s;
+  position: relative;
+  z-index: 1;
+}
+.entry-prompt:hover { color: var(--rose-light); border-color: var(--rose); }
+
+@keyframes fade-rise {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* MAIN WORLD */
+#world {
+  min-height: 100vh;
+  position: relative;
+  z-index: 10;
+}
+
+/* SOFT OBSERVATION BAR */
+#observation {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 500;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 0.9rem;
+  color: rgba(240,224,224,0.6);
+  letter-spacing: 0.05em;
+  opacity: 0;
+  transition: opacity 2s ease;
+  pointer-events: none;
+  text-align: center;
+}
+#observation.visible { opacity: 1; }
+
+/* NAV */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 1.5rem 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(to bottom, rgba(26,21,32,0.9) 0%, transparent 100%);
+}
+.nav-logo {
+  font-family: 'DM Serif Display', serif;
+  font-style: italic;
+  font-size: 1.4rem;
+  color: var(--rose-light);
+  letter-spacing: 0.02em;
+}
+.nav-rooms {
+  display: flex;
+  gap: 1.8rem;
+  list-style: none;
+}
+.nav-rooms a {
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-ghost);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+.nav-rooms a:hover { color: var(--rose-light); }
+
+/* SECTION BASE */
+section {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ═══════════════════════════════════ */
+/* SECTION 1 — THE CAFÉ (opening) */
+/* ═══════════════════════════════════ */
+#cafe {
+  background: linear-gradient(160deg, #1e1520 0%, #241820 40%, #1c1a25 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6rem 2rem;
+}
+
+.cafe-window {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background:
+    linear-gradient(to bottom, transparent 60%, rgba(240,192,96,0.04) 100%);
+}
+
+.window-frame {
+  position: absolute;
+  top: 8%; right: 8%;
+  width: 280px; height: 360px;
+  border: 1px solid rgba(196,176,184,0.15);
+  border-radius: 2px;
+}
+.window-frame::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 0; right: 0;
+  height: 1px;
+  background: rgba(196,176,184,0.1);
+}
+.window-frame::after {
+  content: '';
+  position: absolute;
+  left: 50%; top: 0; bottom: 0;
+  width: 1px;
+  background: rgba(196,176,184,0.1);
+}
+.window-rain-inside {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: linear-gradient(160deg, rgba(138,164,184,0.06) 0%, rgba(30,25,36,0.8) 100%);
+  border-radius: 2px;
+}
+.lamp-glow {
+  position: absolute;
+  bottom: 5%; right: 12%;
+  width: 120px; height: 200px;
+  background: radial-gradient(ellipse at center bottom, rgba(240,192,96,0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.cafe-content {
+  position: relative;
+  z-index: 10;
+  max-width: 600px;
+  text-align: center;
+}
+.section-eyebrow {
+  font-size: 0.65rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--rose);
+  margin-bottom: 2rem;
+  opacity: 0.8;
+}
+.section-headline {
+  font-family: 'DM Serif Display', serif;
+  font-style: italic;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  line-height: 1.2;
+  color: var(--cream);
+  margin-bottom: 1.5rem;
+}
+.section-body {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.15rem;
+  line-height: 1.9;
+  color: var(--text-ghost);
+  margin-bottom: 2rem;
+}
+.section-body em { color: var(--rose-light); font-style: italic; }
+
+.mug-ring {
+  width: 48px; height: 48px;
+  border: 1px solid rgba(201,160,160,0.2);
+  border-radius: 50%;
+  margin: 0 auto 2rem;
+  position: relative;
+}
+.mug-ring::after {
+  content: '';
+  position: absolute;
+  top: 4px; left: 4px; right: 4px; bottom: 4px;
+  border: 1px solid rgba(201,160,160,0.1);
+  border-radius: 50%;
+}
+
+/* ═══════════════════════════════════ */
+/* SECTION 2 — THE SECRET (hidden love) */
+/* ═══════════════════════════════════ */
+#secret {
+  background: linear-gradient(180deg, #1c1a25 0%, #1e1830 100%);
+  display: flex;
+  align-items: center;
+  padding: 8rem 2rem;
+}
+
+.classroom-row {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 40%;
+  background: linear-gradient(to top, rgba(36,29,44,0.95) 0%, transparent 100%);
+}
+
+.desk-silhouettes {
+  position: absolute;
+  bottom: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 3rem;
+  align-items: flex-end;
+}
+.desk {
+  width: 80px; height: 3px;
+  background: rgba(196,176,184,0.1);
+  border-radius: 1px;
+  position: relative;
+}
+.desk::before {
+  content: '';
+  position: absolute;
+  bottom: 3px; left: 10px; right: 10px;
+  height: 24px;
+  background: rgba(196,176,184,0.05);
+  border-radius: 2px 2px 0 0;
+}
+.desk-him { background: rgba(201,160,160,0.25); }
+.desk-him::after {
+  content: 'him.';
+  position: absolute;
+  top: -28px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 0.7rem;
+  color: rgba(201,160,160,0.4);
+  white-space: nowrap;
+  letter-spacing: 0.1em;
+}
+
+.secret-content {
+  position: relative;
+  z-index: 10;
+  max-width: 700px;
+  padding-left: 8vw;
+}
+
+.secret-sticky {
+  background: rgba(240,224,160,0.08);
+  border: 1px solid rgba(240,224,160,0.12);
+  padding: 1.2rem 1.5rem;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 1rem;
+  color: rgba(240,224,160,0.7);
+  line-height: 1.8;
+  transform: rotate(-1.5deg);
+  display: inline-block;
+  margin-bottom: 3rem;
+  position: relative;
+}
+.secret-sticky::before {
+  content: '';
+  position: absolute;
+  top: -8px; left: 50%;
+  transform: translateX(-50%);
+  width: 20px; height: 8px;
+  background: rgba(240,224,160,0.15);
+  border-radius: 0 0 2px 2px;
+}
+
+.heartbeat-line {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(201,160,160,0.3), rgba(201,160,160,0.6), rgba(201,160,160,0.3), transparent);
+  margin: 2rem 0;
+  animation: heartbeat-pulse 2s ease-in-out infinite;
+}
+@keyframes heartbeat-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* ═══════════════════════════════════ */
+/* SECTION 3 — THE METRO */
+/* ═══════════════════════════════════ */
+#metro {
+  background: linear-gradient(160deg, #1a1830 0%, #1e2030 100%);
+  padding: 8rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.metro-line {
+  position: absolute;
+  left: 0; right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 2px;
+  background: linear-gradient(to right, transparent, rgba(138,164,184,0.2), rgba(138,164,184,0.4), rgba(138,164,184,0.2), transparent);
+}
+
+.metro-stations {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  text-align: center;
+}
+
+.metro-map {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin: 3rem 0;
+  position: relative;
+  overflow-x: auto;
+  padding: 2rem 0;
+}
+.metro-station {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+.station-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--rain);
+  border: 2px solid var(--rain-light);
+  position: relative;
+  z-index: 2;
+  cursor: pointer;
+  transition: transform 0.3s, background 0.3s;
+}
+.station-dot:hover, .station-dot.active {
+  background: var(--rose);
+  border-color: var(--rose-light);
+  transform: scale(1.4);
+}
+.station-connector {
+  width: 60px; height: 2px;
+  background: rgba(138,164,184,0.3);
+  flex-shrink: 0;
+}
+.station-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 0.7rem;
+  color: var(--text-ghost);
+  letter-spacing: 0.05em;
+  text-align: center;
+  max-width: 70px;
+}
+.station-memory {
+  display: none;
+  font-size: 0.65rem;
+  color: var(--rose-light);
+  text-align: center;
+  max-width: 80px;
+  line-height: 1.5;
+  margin-top: 0.3rem;
+}
+.station-dot.active + .station-name + .station-memory { display: block; }
+
+/* ═══════════════════════════════════ */
+/* SECTION 4 — SURVIVAL (the rough parts) */
+/* ═══════════════════════════════════ */
+#survival {
+  background: linear-gradient(180deg, #1e1830 0%, #201520 100%);
+  padding: 8rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.survival-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  max-width: 800px;
+  width: 100%;
+  position: relative;
+  z-index: 10;
+}
+.survival-card {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(196,176,184,0.08);
+  border-radius: 4px;
+  padding: 1.5rem;
+  transition: border-color 0.4s, background 0.4s;
+  cursor: default;
+}
+.survival-card:hover {
+  background: rgba(201,160,160,0.04);
+  border-color: rgba(201,160,160,0.2);
+}
+.survival-card-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 1.1rem;
+  color: var(--rose-light);
+  margin-bottom: 0.5rem;
+}
+.survival-card-text {
+  font-size: 0.8rem;
+  color: var(--text-ghost);
+  line-height: 1.7;
+  letter-spacing: 0.02em;
+}
+.survival-and {
+  grid-column: 1 / -1;
+  text-align: center;
+  font-family: 'DM Serif Display', serif;
+  font-style: italic;
+  font-size: 2.5rem;
+  color: var(--rose);
+  padding: 1rem 0;
+  opacity: 0.7;
+}
+
+/* ═══════════════════════════════════ */
+/* SECTION 5 — THE FACETIME ROOM */
+/* ═══════════════════════════════════ */
+#facetime-room {
+  background: linear-gradient(180deg, #201520 0%, #1a1228 100%);
+  padding: 8rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.facetime-frame {
+  position: relative;
+  width: 340px;
+  aspect-ratio: 9/16;
+  max-height: 60vh;
+  background: linear-gradient(160deg, #141020 0%, #1a1530 100%);
+  border: 1px solid rgba(196,176,184,0.1);
+  border-radius: 16px;
+  overflow: hidden;
+  margin: 0 auto 3rem;
+}
+.facetime-frame::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 30% 40%, rgba(201,160,160,0.04) 0%, transparent 60%);
+}
+.facetime-notch {
+  position: absolute;
+  top: 10px; left: 50%;
+  transform: translateX(-50%);
+  width: 80px; height: 20px;
+  background: rgba(26,21,32,0.9);
+  border-radius: 0 0 12px 12px;
+}
+.facetime-time {
+  position: absolute;
+  top: 40px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.7rem;
+  color: rgba(240,224,224,0.4);
+  letter-spacing: 0.15em;
+}
+.facetime-name {
+  position: absolute;
+  top: 80px; left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 1.3rem;
+  color: rgba(240,224,224,0.7);
+  white-space: nowrap;
+}
+.facetime-status {
+  position: absolute;
+  top: 110px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.65rem;
+  color: var(--rose);
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+}
+.status-dot {
+  display: inline-block;
+  width: 5px; height: 5px;
+  background: var(--rose);
+  border-radius: 50%;
+  margin-right: 5px;
+  animation: blink 2s ease infinite;
+  vertical-align: middle;
+}
+@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0;} }
+
+.facetime-battery {
+  position: absolute;
+  bottom: 60px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.6rem;
+  color: rgba(240,224,224,0.3);
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+}
+.facetime-asleep {
+  position: absolute;
+  bottom: 100px; left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 0.75rem;
+  color: rgba(240,224,224,0.25);
+  white-space: nowrap;
+}
+
+.facetime-content {
+  position: relative;
+  z-index: 10;
+  max-width: 500px;
+  text-align: center;
+}
+
+/* ═══════════════════════════════════ */
+/* SECTION 6 — SCRAPBOOK */
+/* ═══════════════════════════════════ */
+#scrapbook {
+  background: linear-gradient(180deg, #1a1228 0%, #1e1830 100%);
+  padding: 8rem 2rem;
+  min-height: auto;
+}
+
+.scrapbook-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 10;
+}
+
+@media (max-width: 600px) {
+  .scrapbook-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.polaroid {
+  background: rgba(247,240,230,0.06);
+  border: 1px solid rgba(247,240,230,0.08);
+  padding: 1rem 1rem 2rem;
+  font-family: 'Cormorant Garamond', serif;
+  cursor: pointer;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s;
+  position: relative;
+}
+.polaroid:nth-child(odd) { transform: rotate(-1.5deg); }
+.polaroid:nth-child(even) { transform: rotate(1deg); }
+.polaroid:hover {
+  transform: rotate(0deg) scale(1.05) !important;
+  z-index: 20;
+}
+.polaroid-img {
+  width: 100%;
+  aspect-ratio: 1;
+  background: rgba(26,21,32,0.8);
+  margin-bottom: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.polaroid-emoji {
+  font-size: 2.5rem;
+  filter: grayscale(0.3);
+}
+.polaroid-caption {
+  font-style: italic;
+  font-size: 0.75rem;
+  color: rgba(247,240,230,0.5);
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* ═══════════════════════════════════ */
+/* SECTION 7 — HIM (suchir's chapter) */
+/* ═══════════════════════════════════ */
+#him {
+  background: linear-gradient(160deg, #1e1830 0%, #1c1520 60%, #201828 100%);
+  padding: 10rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.him-content {
+  position: relative;
+  z-index: 10;
+  max-width: 680px;
+  text-align: center;
+}
+.him-stars {
+  display: flex;
+  gap: 0.3rem;
+  justify-content: center;
+  margin-bottom: 3rem;
+}
+.him-star {
+  width: 3px; height: 3px;
+  background: var(--lamp);
+  border-radius: 50%;
+  opacity: 0;
+  animation: twinkle 3s ease infinite;
+}
+.him-star:nth-child(1) { animation-delay: 0s; }
+.him-star:nth-child(2) { animation-delay: 0.4s; }
+.him-star:nth-child(3) { animation-delay: 0.8s; }
+.him-star:nth-child(4) { animation-delay: 1.2s; }
+.him-star:nth-child(5) { animation-delay: 1.6s; }
+.him-star:nth-child(6) { animation-delay: 2s; }
+.him-star:nth-child(7) { animation-delay: 2.4s; }
+@keyframes twinkle {
+  0%,100%{opacity:0.2;} 50%{opacity:0.8;}
+}
+
+.him-achievement {
+  background: rgba(240,192,96,0.04);
+  border: 1px solid rgba(240,192,96,0.12);
+  border-radius: 4px;
+  padding: 1.2rem 2rem;
+  margin: 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  text-align: left;
+  transition: background 0.3s, border-color 0.3s;
+}
+.him-achievement:hover {
+  background: rgba(240,192,96,0.07);
+  border-color: rgba(240,192,96,0.25);
+}
+.achievement-icon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+.achievement-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+  color: rgba(240,224,160,0.7);
+  line-height: 1.6;
+  font-style: italic;
+}
+.achievement-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  color: var(--lamp);
+  text-transform: uppercase;
+  margin-bottom: 0.2rem;
+  opacity: 0.7;
+}
+
+/* ═══════════════════════════════════ */
+/* SECTION 8 — BANGALORE WEEK */
+/* ═══════════════════════════════════ */
+#bangalore {
+  background: linear-gradient(160deg, #201828 0%, #1a1c28 100%);
+  padding: 10rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bangalore-glow {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px; height: 400px;
+  background: radial-gradient(ellipse, rgba(184,175,200,0.05) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.bangalore-content {
+  position: relative;
+  z-index: 10;
+  max-width: 640px;
+  text-align: center;
+}
+.bangalore-badge {
+  display: inline-block;
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--lavender);
+  border: 1px solid rgba(184,175,200,0.3);
+  border-radius: 20px;
+  padding: 0.4rem 1.2rem;
+  margin-bottom: 2.5rem;
+}
+
+.countdown-display {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(3rem, 8vw, 5.5rem);
+  color: var(--lavender-light);
+  line-height: 1;
+  margin: 1rem 0;
+  opacity: 0.9;
+}
+.countdown-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--lavender);
+  opacity: 0.6;
+}
+
+.bangalore-days {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin: 3rem 0;
+}
+.bangalore-day {
+  width: 36px; height: 36px;
+  border: 1px solid rgba(184,175,200,0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  color: var(--lavender);
+  opacity: 0.5;
+  cursor: default;
+  font-family: 'Cormorant Garamond', serif;
+  transition: all 0.4s;
+}
+.bangalore-day.sacred {
+  border-color: rgba(184,175,200,0.6);
+  background: rgba(184,175,200,0.06);
+  opacity: 1;
+  animation: day-glow 3s ease infinite;
+}
+@keyframes day-glow {
+  0%,100%{box-shadow: 0 0 0 0 rgba(184,175,200,0);} 
+  50%{box-shadow: 0 0 12px 2px rgba(184,175,200,0.15);}
+}
+
+/* ═══════════════════════════════════ */
+/* SECTION 9 — THE LETTER */
+/* ═══════════════════════════════════ */
+#letter-section {
+  background: linear-gradient(180deg, #1a1c28 0%, #1a1520 100%);
+  padding: 8rem 2rem 10rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+
+/* ═══════════════════════════════════ */
+/* SECTION 10 — ROOFTOP (ending) */
+/* ═══════════════════════════════════ */
+#rooftop {
+  background: linear-gradient(180deg, #1a1520 0%, #0e0c15 100%);
+  padding: 8rem 2rem 6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh;
+}
+
+.rooftop-content {
+  position: relative;
+  z-index: 10;
+  max-width: 580px;
+  text-align: center;
+}
+.rooftop-sky {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+}
+.sky-star {
+  position: absolute;
+  width: 2px; height: 2px;
+  background: white;
+  border-radius: 50%;
+  opacity: 0;
+  animation: twinkle 4s ease infinite;
+}
+
+.rooftop-final {
+  font-family: 'DM Serif Display', serif;
+  font-style: italic;
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  color: var(--cream);
+  line-height: 1.4;
+  margin-bottom: 2rem;
+}
+.rooftop-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--text-ghost);
+  line-height: 1.9;
+}
+.rooftop-time {
+  margin-top: 3rem;
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(196,176,184,0.3);
+}
+
+/* TIMELINE DOTS (side) */
+.timeline-nav {
+  position: fixed;
+  right: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  z-index: 200;
+}
+.timeline-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: rgba(196,176,184,0.2);
+  cursor: pointer;
+  transition: background 0.3s, transform 0.3s;
+}
+.timeline-dot.active {
+  background: var(--rose);
+  transform: scale(1.4);
+}
+.timeline-dot:hover { background: rgba(201,160,160,0.6); }
+
+/* SCROLL ANIMATIONS */
+.fade-up {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* AMBIENT MUSIC TOGGLE */
+#music-toggle {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 300;
+  width: 40px; height: 40px;
+  border: 1px solid rgba(196,176,184,0.2);
+  border-radius: 50%;
+  background: rgba(26,21,32,0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.3s;
+  backdrop-filter: blur(4px);
+}
+#music-toggle:hover { border-color: rgba(201,160,160,0.5); }
+.music-bars {
+  display: flex;
+  gap: 2px;
+  align-items: flex-end;
+  height: 16px;
+}
+.bar {
+  width: 2px;
+  background: var(--rose-light);
+  border-radius: 1px;
+  opacity: 0.5;
+  transition: opacity 0.3s;
+}
+.bar:nth-child(1) { height: 6px; animation: bar-anim 1s ease infinite; }
+.bar:nth-child(2) { height: 12px; animation: bar-anim 1s ease infinite 0.2s; }
+.bar:nth-child(3) { height: 8px; animation: bar-anim 1s ease infinite 0.4s; }
+.bar:nth-child(4) { height: 14px; animation: bar-anim 1s ease infinite 0.1s; }
+@keyframes bar-anim {
+  0%,100%{transform:scaleY(0.4);} 50%{transform:scaleY(1);}
+}
+#music-toggle.paused .bar { animation-play-state: paused; opacity: 0.2; }
+
+/* MESSAGE BUBBLE (surprise) */
+.chat-bubble {
+  display: inline-block;
+  background: rgba(201,160,160,0.1);
+  border: 1px solid rgba(201,160,160,0.2);
+  border-radius: 18px 18px 18px 4px;
+  padding: 0.6rem 1.2rem;
+  font-size: 0.85rem;
+  color: rgba(240,224,224,0.7);
+  margin: 0.5rem 0;
+  position: relative;
+}
+.chat-bubble.sent {
+  border-radius: 18px 18px 4px 18px;
+  background: rgba(138,164,184,0.08);
+  border-color: rgba(138,164,184,0.15);
+  align-self: flex-end;
+  margin-left: auto;
+}
+.chat-thread {
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  margin: 2rem auto;
+  gap: 0.3rem;
+}
+
+/* LATE NIGHT MODE */
+body.late-night {
+  filter: sepia(0.1) brightness(0.9);
+}
+body.late-night #observation {
+  color: rgba(240,192,96,0.5);
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .nav-rooms { display: none; }
+  .window-frame { display: none; }
+  .scrapbook-grid { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<div class="grain"></div>
+<canvas id="rain-canvas"></canvas>
+
+<!-- Observation text -->
+<div id="observation" role="status" aria-live="polite"></div>
+
+<!-- Music toggle -->
+<div id="music-toggle" title="ambient sound" aria-label="toggle ambient sound">
+  <div class="music-bars">
+    <div class="bar"></div>
+    <div class="bar"></div>
+    <div class="bar"></div>
+    <div class="bar"></div>
+  </div>
+</div>
+
+<!-- Timeline nav -->
+<nav class="timeline-nav" aria-label="section navigation">
+  <div class="timeline-dot active" data-section="cafe" title="the café"></div>
+  <div class="timeline-dot" data-section="secret" title="the secret"></div>
+  <div class="timeline-dot" data-section="metro" title="the metro"></div>
+  <div class="timeline-dot" data-section="survival" title="us, surviving"></div>
+  <div class="timeline-dot" data-section="facetime-room" title="late night calls"></div>
+  <div class="timeline-dot" data-section="scrapbook" title="the scrapbook"></div>
+  <div class="timeline-dot" data-section="him" title="him"></div>
+  <div class="timeline-dot" data-section="bangalore" title="bangalore week"></div>
+  <div class="timeline-dot" data-section="rooftop" title="the rooftop"></div>
+</nav>
+
+<!-- ENTRY SCREEN -->
+<div id="entry" role="dialog" aria-label="welcome screen">
+  <div class="entry-ambient"></div>
+  <h1 class="entry-title">us.</h1>
+  <p class="entry-sub">a. & s. &nbsp;·&nbsp; almost three years</p>
+  <p class="entry-prompt" id="enter-btn" role="button" tabindex="0">come inside ↓</p>
+</div>
+
+<!-- MAIN WORLD -->
+<div id="world" aria-hidden="true">
+
+  <nav aria-label="room navigation">
+    <div class="nav-logo">us.</div>
+    <ul class="nav-rooms">
+      <li><a href="#cafe">the café</a></li>
+      <li><a href="#metro">the metro</a></li>
+      <li><a href="#facetime-room">late nights</a></li>
+      <li><a href="#him">him</a></li>
+      <li><a href="#bangalore">bangalore</a></li>
+    </ul>
+  </nav>
+
+  <!-- ═══ CAFÉ ═══ -->
+  <section id="cafe" aria-label="the café">
+    <div class="cafe-window">
+      <div class="window-frame">
+        <div class="window-rain-inside"></div>
+      </div>
+      <div class="lamp-glow"></div>
+    </div>
+    <div class="cafe-content fade-up">
+      <div class="mug-ring" aria-hidden="true"></div>
+      <p class="section-eyebrow">the beginning of everything</p>
+      <h2 class="section-headline">before we were us,<br>we were already something.</h2>
+      <p class="section-body">
+        You sat in front of me every single day.<br>
+        I watched the back of your head in class and <em>hoped</em>.<br>
+        For a year and a half, I was quietly, completely gone on you —<br>
+        and you had no idea.
+      </p>
+      <p class="section-body" style="font-size:0.9rem; opacity:0.7;">
+        And then one day you did something about it.<br>
+        And the world rearranged itself.
+      </p>
+    </div>
+  </section>
+
+  <!-- ═══ SECRET ═══ -->
+  <section id="secret" aria-label="the secret phase">
+    <div class="classroom-row" aria-hidden="true"></div>
+    <div class="desk-silhouettes" aria-hidden="true">
+      <div class="desk"></div>
+      <div class="desk desk-him"></div>
+      <div class="desk"></div>
+    </div>
+    <div class="secret-content fade-up">
+      <p class="section-eyebrow">the hidden chapter</p>
+      <div class="secret-sticky" aria-label="a sticky note">
+        pretending.<br>
+        sitting normally.<br>
+        secretly obsessed.
+      </div>
+      <h2 class="section-headline" style="font-size:2.2rem;">stolen glances across a room<br>that didn't know our secret.</h2>
+      <p class="section-body">
+        We hid everything for a while. Walked past each other in corridors like strangers.<br>
+        Smiled with restraint. Sat at the right distance.<br>
+        <em>And underneath it all, we were already so far gone.</em>
+      </p>
+      <div class="heartbeat-line" aria-hidden="true"></div>
+      <div class="chat-thread" aria-label="messages">
+        <div class="chat-bubble">"reached home?"</div>
+        <div class="chat-bubble sent">"yeah. thanks for today."</div>
+        <div class="chat-bubble" style="font-style:italic; opacity:0.5; font-size:0.75rem;">typing...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ METRO ═══ -->
+  <section id="metro" aria-label="delhi metro memories">
+    <div class="metro-line" aria-hidden="true"></div>
+    <div class="metro-stations fade-up">
+      <p class="section-eyebrow">delhi, always</p>
+      <h2 class="section-headline">every station<br>had a memory in it.</h2>
+      <div class="metro-map" role="list" aria-label="metro memory stations">
+        <div class="metro-station" role="listitem">
+          <div class="station-dot active" tabindex="0" aria-label="vaishali station"></div>
+          <div class="station-name">vaishali</div>
+          <div class="station-memory">where it started feeling real</div>
+        </div>
+        <div class="station-connector" aria-hidden="true"></div>
+        <div class="metro-station" role="listitem">
+          <div class="station-dot" tabindex="0" aria-label="yamuna bank station"></div>
+          <div class="station-name">yamuna<br>bank</div>
+          <div class="station-memory">the river, the window, you</div>
+        </div>
+        <div class="station-connector" aria-hidden="true"></div>
+        <div class="metro-station" role="listitem">
+          <div class="station-dot" tabindex="0" aria-label="rajiv chowk station"></div>
+          <div class="station-name">rajiv<br>chowk</div>
+          <div class="station-memory">changing lines, staying together</div>
+        </div>
+        <div class="station-connector" aria-hidden="true"></div>
+        <div class="metro-station" role="listitem">
+          <div class="station-dot" tabindex="0" aria-label="hauz khas station"></div>
+          <div class="station-name">hauz<br>khas</div>
+          <div class="station-memory">late and laughing at nothing</div>
+        </div>
+        <div class="station-connector" aria-hidden="true"></div>
+        <div class="metro-station" role="listitem">
+          <div class="station-dot" tabindex="0" aria-label="IIT station"></div>
+          <div class="station-name">iit</div>
+          <div class="station-memory">almost home. almost over.</div>
+        </div>
+      </div>
+      <p class="section-body" style="font-size:0.85rem;">
+        The Delhi metro was our moving room.<br>
+        Standing too close because the compartment was crowded.<br>
+        <em>And then because we wanted to.</em>
+      </p>
+    </div>
+  </section>
+
+  <!-- ═══ SURVIVAL ═══ -->
+  <section id="survival" aria-label="how we survived">
+    <div class="survival-grid fade-up">
+      <div style="grid-column:1/-1; text-align:center; margin-bottom:1rem;">
+        <p class="section-eyebrow">the real part</p>
+        <h2 class="section-headline">this is what we survived.</h2>
+        <p class="section-body" style="font-size:0.85rem; margin-bottom:0;">
+          not as a badge. just as a truth.
+        </p>
+      </div>
+      <div class="survival-card">
+        <div class="survival-card-title">endless fights</div>
+        <div class="survival-card-text">the ones that felt final.<br>the ones that weren't.</div>
+      </div>
+      <div class="survival-card">
+        <div class="survival-card-title">emotional spirals</div>
+        <div class="survival-card-text">mostly mine. you stayed anyway.</div>
+      </div>
+      <div class="survival-card">
+        <div class="survival-card-title">silence</div>
+        <div class="survival-card-text">the kind that hurt and the kind that healed.</div>
+      </div>
+      <div class="survival-card">
+        <div class="survival-card-title">insecurity</div>
+        <div class="survival-card-text">needing reassurance while pretending not to.</div>
+      </div>
+      <div class="survival-card">
+        <div class="survival-card-title">stubbornness</div>
+        <div class="survival-card-text">both of us. usually at the same time.</div>
+      </div>
+      <div class="survival-card">
+        <div class="survival-card-title">exhaustion</div>
+        <div class="survival-card-text">and still choosing each other anyway.</div>
+      </div>
+      <div class="survival-and">and.</div>
+      <div style="grid-column:1/-1; text-align:center;">
+        <p class="section-body">
+          <em>We always became best friends again.</em><br>
+          Every single time. That part never changed.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FACETIME ROOM ═══ -->
+  <section id="facetime-room" aria-label="late night facetime">
+    <div class="facetime-content fade-up">
+      <p class="section-eyebrow">2:47 am, often</p>
+      <h2 class="section-headline" style="text-align:center; margin-bottom:3rem;">
+        some of the best hours<br>were the ones we didn't speak.
+      </h2>
+    </div>
+    <div class="facetime-frame" aria-label="a facetime call in progress">
+      <div class="facetime-notch" aria-hidden="true"></div>
+      <div class="facetime-time" aria-hidden="true">02:47</div>
+      <div class="facetime-name">suchir</div>
+      <div class="facetime-status">
+        <span class="status-dot" aria-hidden="true"></span>
+        connected · 3h 22m
+      </div>
+      <div class="facetime-asleep" aria-hidden="true">he fell asleep first. again.</div>
+      <div class="facetime-battery" aria-hidden="true">⚡ 12% — charge your phone</div>
+    </div>
+    <div class="facetime-content fade-up" style="margin-top:3rem; text-align:center;">
+      <p class="section-body">
+        Staying on call while doing separate things.<br>
+        Falling asleep together on different pillows.<br>
+        The background noise of each other's rooms.<br>
+        <em>That was intimacy.</em>
+      </p>
+    </div>
+  </section>
+
+  <!-- ═══ SCRAPBOOK ═══ -->
+  <section id="scrapbook" aria-label="memory scrapbook" style="min-height:auto; padding:8rem 2rem;">
+    <div style="text-align:center; margin-bottom:4rem;" class="fade-up">
+      <p class="section-eyebrow">collected</p>
+      <h2 class="section-headline">the archive of us.</h2>
+    </div>
+    <div class="scrapbook-grid fade-up">
+      <div class="polaroid" tabindex="0">
+        <div class="polaroid-img"><span class="polaroid-emoji" aria-hidden="true">🎬</span></div>
+        <div class="polaroid-caption">movie theatre.<br>the dark was ours.</div>
+      </div>
+      <div class="polaroid" tabindex="0">
+        <div class="polaroid-img"><span class="polaroid-emoji" aria-hidden="true">🍜</span></div>
+        <div class="polaroid-caption">random delivery at 11pm.<br>"i missed you."</div>
+      </div>
+      <div class="polaroid" tabindex="0">
+        <div class="polaroid-img"><span class="polaroid-emoji" aria-hidden="true">🏢</span></div>
+        <div class="polaroid-caption">the staircase.<br>our private universe.</div>
+      </div>
+      <div class="polaroid" tabindex="0">
+        <div class="polaroid-img"><span class="polaroid-emoji" aria-hidden="true">🌃</span></div>
+        <div class="polaroid-caption">delhi after midnight.<br>felt like a different city.</div>
+      </div>
+      <div class="polaroid" tabindex="0">
+        <div class="polaroid-img"><span class="polaroid-emoji" aria-hidden="true">💬</span></div>
+        <div class="polaroid-caption">dry texting.<br>secretly wanting attention.</div>
+      </div>
+      <div class="polaroid" tabindex="0">
+        <div class="polaroid-img"><span class="polaroid-emoji" aria-hidden="true">☁️</span></div>
+        <div class="polaroid-caption">squash, then stairs,<br>then everything else.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ HIM ═══ -->
+  <section id="him" aria-label="about suchir">
+    <div class="him-content fade-up">
+      <div class="him-stars" aria-hidden="true">
+        <div class="him-star"></div><div class="him-star"></div>
+        <div class="him-star"></div><div class="him-star"></div>
+        <div class="him-star"></div><div class="him-star"></div>
+        <div class="him-star"></div>
+      </div>
+      <p class="section-eyebrow">for suchir</p>
+      <h2 class="section-headline">look at what you became.</h2>
+      <p class="section-body" style="margin-bottom:2.5rem;">
+        You worked insanely hard.<br>
+        Through exhaustion, through doubt, through the months that felt endless.<br>
+        <em>And then you got in.</em>
+      </p>
+
+      <div class="him-achievement">
+        <span class="achievement-icon" aria-hidden="true">🌿</span>
+        <div>
+          <div class="achievement-label">atlassian</div>
+          <div class="achievement-text">months of work. quiet persistence. you did it on your own terms.</div>
+        </div>
+      </div>
+      <div class="him-achievement">
+        <span class="achievement-icon" aria-hidden="true">✦</span>
+        <div>
+          <div class="achievement-label">the softness</div>
+          <div class="achievement-text">you stay during chaos. you understand even when i'm unreasonable. that is rare.</div>
+        </div>
+      </div>
+      <div class="him-achievement">
+        <span class="achievement-icon" aria-hidden="true">◎</span>
+        <div>
+          <div class="achievement-label">consistency</div>
+          <div class="achievement-text">your love doesn't announce itself. it just shows up. every single time.</div>
+        </div>
+      </div>
+
+      <p class="section-body" style="margin-top:2.5rem; font-size:0.9rem; opacity:0.8;">
+        You are someone who is becoming something.<br>
+        And I have been watching from the beginning.
+      </p>
+    </div>
+  </section>
+
+  <!-- ═══ BANGALORE WEEK ═══ -->
+  <section id="bangalore" aria-label="the bangalore week">
+    <div class="bangalore-glow" aria-hidden="true"></div>
+    <div class="bangalore-content fade-up">
+      <p class="section-eyebrow">we'll both be in bangalore</p>
+      <h2 class="section-headline">you built something real.<br>i'll be there to see it.</h2>
+      <p class="section-body">
+        You'll be starting something new.<br>
+        I'll be there with you for the first chapter.<br>
+        <em>That week is going to feel like a whole movie.</em>
+      </p>
+
+      <p class="section-body" style="font-size:0.85rem; opacity:0.7; margin-top:2rem;">
+        And after — you in bangalore, me in delhi.<br>
+        Long distance starts. But so does everything else.<br>
+        <em>We're still choosing each other.</em>
+      </p>
+    </div>
+  </section>
+
+
+
+  <!-- ═══ ROOFTOP ═══ -->
+  <section id="rooftop" aria-label="the rooftop ending">
+    <div class="rooftop-sky" aria-hidden="true" id="rooftop-sky"></div>
+    <div class="rooftop-content fade-up">
+      <p class="section-eyebrow">the rooftop. always the rooftop.</p>
+      <h2 class="rooftop-final">
+        two people,<br>growing up together<br>in real time.
+      </h2>
+      <p class="rooftop-sub">
+        Not just dating. Becoming home to each other.<br>
+        <em>That is the whole story.</em><br><br>
+        Still here. Still us.
+      </p>
+      <p class="rooftop-time" id="live-time" aria-live="polite"></p>
+    </div>
+  </section>
+
+</div><!-- end world -->
+
+<script>
+// ═══ RAIN ═══
+const canvas = document.getElementById('rain-canvas');
+const ctx = canvas.getContext('2d');
+let drops = [];
+function initRain(){
+  canvas.width=window.innerWidth; canvas.height=window.innerHeight;
+  drops=[];
+  for(let i=0;i<80;i++){
+    drops.push({
+      x:Math.random()*canvas.width,
+      y:Math.random()*canvas.height,
+      length:Math.random()*20+8,
+      speed:Math.random()*2+1,
+      opacity:Math.random()*0.3+0.05
+    });
+  }
+}
+function drawRain(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  drops.forEach(d=>{
+    ctx.beginPath();
+    ctx.moveTo(d.x,d.y);
+    ctx.lineTo(d.x-d.length*0.2,d.y+d.length);
+    ctx.strokeStyle=`rgba(138,164,184,${d.opacity})`;
+    ctx.lineWidth=0.5;
+    ctx.stroke();
+    d.y+=d.speed; d.x-=d.speed*0.2;
+    if(d.y>canvas.height){ d.y=-20; d.x=Math.random()*canvas.width; }
+  });
+  requestAnimationFrame(drawRain);
+}
+initRain(); drawRain();
+window.addEventListener('resize',initRain);
+
+// ═══ FLOATING PARTICLES ═══
+for(let i=0;i<15;i++){
+  const p=document.createElement('div');
+  p.className='particle';
+  p.style.left=Math.random()*100+'vw';
+  p.style.animationDuration=(Math.random()*20+15)+'s';
+  p.style.animationDelay=Math.random()*10+'s';
+  p.style.width=p.style.height=(Math.random()*2+1)+'px';
+  document.body.appendChild(p);
+}
+
+// ═══ ENTRY ═══
+const entry=document.getElementById('entry');
+const world=document.getElementById('world');
+const enterBtn=document.getElementById('enter-btn');
+let entered=false;
+function enterWorld(){
+  if(entered)return;
+  entered=true;
+  entry.classList.add('hidden');
+  world.removeAttribute('aria-hidden');
+  setTimeout(()=>entry.remove(),1600);
+  showObservation("the apartment feels warm tonight.");
+}
+enterBtn.addEventListener('click',enterWorld);
+enterBtn.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' ')enterWorld(); });
+
+// ═══ OBSERVATIONS ═══
+const observations=[
+  "tonight feels quieter.",
+  "you always come back after difficult days.",
+  "the apartment feels warm tonight.",
+  "he stayed even during the hard parts.",
+  "you both stayed awake late again.",
+  "some things don't need words.",
+  "almost three years. still choosing.",
+  "the rain outside doesn't feel so far away.",
+  "you opened the memory room again.",
+  "best friends through all of it.",
+];
+let obsIdx=0;
+const obsEl=document.getElementById('observation');
+function showObservation(text){
+  obsEl.textContent=text||observations[obsIdx%observations.length];
+  obsEl.classList.add('visible');
+  obsIdx++;
+  setTimeout(()=>obsEl.classList.remove('visible'),5000);
+}
+setInterval(()=>{
+  if(entered) showObservation();
+}, 18000);
+
+// ═══ FADE UP OBSERVER ═══
+const fadeEls=document.querySelectorAll('.fade-up');
+const fadeObs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){ e.target.classList.add('visible'); fadeObs.unobserve(e.target); }
+  });
+},{threshold:0.15});
+fadeEls.forEach(el=>fadeObs.observe(el));
+
+// ═══ TIMELINE DOTS ═══
+const sections=['cafe','secret','metro','survival','facetime-room','scrapbook','him','bangalore','rooftop'];
+const dots=document.querySelectorAll('.timeline-dot');
+function updateTimeline(){
+  sections.forEach((id,i)=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    const rect=el.getBoundingClientRect();
+    if(rect.top<=window.innerHeight/2&&rect.bottom>=window.innerHeight/2){
+      dots.forEach(d=>d.classList.remove('active'));
+      dots[i]&&dots[i].classList.add('active');
+    }
+  });
+}
+window.addEventListener('scroll',updateTimeline,{passive:true});
+dots.forEach((d,i)=>{
+  d.addEventListener('click',()=>{
+    const el=document.getElementById(sections[i]);
+    if(el) el.scrollIntoView({behavior:'smooth'});
+  });
+});
+
+// ═══ METRO STATIONS ═══
+document.querySelectorAll('.station-dot').forEach(dot=>{
+  dot.addEventListener('click',()=>{
+    document.querySelectorAll('.station-dot').forEach(d=>d.classList.remove('active'));
+    dot.classList.add('active');
+    const mem=dot.nextElementSibling?.nextElementSibling;
+    document.querySelectorAll('.station-memory').forEach(m=>m.style.display='none');
+    if(mem&&mem.classList.contains('station-memory')) mem.style.display='block';
+  });
+  dot.addEventListener('keydown',e=>{
+    if(e.key==='Enter'||e.key===' ') dot.click();
+  });
+});
+
+// ═══ ROOFTOP STARS ═══
+const rooftopSky=document.getElementById('rooftop-sky');
+for(let i=0;i<60;i++){
+  const star=document.createElement('div');
+  star.className='sky-star';
+  star.style.left=Math.random()*100+'%';
+  star.style.top=Math.random()*100+'%';
+  star.style.animationDelay=Math.random()*4+'s';
+  star.style.animationDuration=(Math.random()*3+2)+'s';
+  star.style.opacity=Math.random()*0.5+0.1;
+  rooftopSky.appendChild(star);
+}
+
+// ═══ LIVE TIME ═══
+const timeEl=document.getElementById('live-time');
+function updateTime(){
+  const now=new Date();
+  const opts={hour:'2-digit',minute:'2-digit',timeZoneName:'short',hour12:true};
+  timeEl.textContent=now.toLocaleTimeString('en-IN',opts)+' · delhi time';
+}
+updateTime(); setInterval(updateTime,60000);
+
+// ═══ LATE NIGHT MODE ═══
+function checkLateNight(){
+  const h=new Date().getHours();
+  if(h>=0&&h<5){
+    document.body.classList.add('late-night');
+    if(Math.random()<0.3) showObservation("it's late. you're still here.");
+  }
+}
+checkLateNight();
+
+// ═══ AMBIENT SOUND (Web Audio API) ═══
+const musicBtn=document.getElementById('music-toggle');
+let audioCtx=null, noiseSource=null, gainNode=null, playing=false;
+
+function createRainSound(){
+  if(!audioCtx) audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  const bufferSize=audioCtx.sampleRate*3;
+  const buffer=audioCtx.createBuffer(1,bufferSize,audioCtx.sampleRate);
+  const data=buffer.getChannelData(0);
+  for(let i=0;i<bufferSize;i++) data[i]=(Math.random()*2-1);
+  
+  const source=audioCtx.createBufferSource();
+  source.buffer=buffer; source.loop=true;
+  
+  const lowpass=audioCtx.createBiquadFilter();
+  lowpass.type='lowpass'; lowpass.frequency.value=600;
+  
+  gainNode=audioCtx.createGain(); gainNode.gain.value=0;
+  
+  source.connect(lowpass); lowpass.connect(gainNode); gainNode.connect(audioCtx.destination);
+  source.start();
+  gainNode.gain.setTargetAtTime(0.06,audioCtx.currentTime,1);
+  noiseSource=source;
+  playing=true;
+}
+
+musicBtn.addEventListener('click',()=>{
+  if(!playing){
+    createRainSound();
+    musicBtn.classList.remove('paused');
+    showObservation("rain sounds. just like your late nights.");
+  } else {
+    if(gainNode) gainNode.gain.setTargetAtTime(0,audioCtx.currentTime,0.5);
+    setTimeout(()=>{ if(noiseSource){noiseSource.stop();noiseSource=null;} },1000);
+    playing=false;
+    musicBtn.classList.add('paused');
+  }
+});
+
+// ═══ POLAROID INTERACTIONS ═══
+document.querySelectorAll('.polaroid').forEach(p=>{
+  p.addEventListener('keydown',e=>{
+    if(e.key==='Enter') { p.style.transform='rotate(0deg) scale(1.05)'; }
+  });
+});
+
+// ═══ SCROLL OBSERVATIONS ═══
+const sectionObservations={
+  'secret':"you hid it for so long. he never knew.",
+  'metro':"the metro smelled like rain and almost-confessions.",
+  'survival':"and they still chose each other.",
+  'facetime-room':"one of them always falls asleep first.",
+  'him':"he worked harder than you knew. be proud of him.",
+  'bangalore':"seven days. make them count.",
+};
+const sectionObs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting&&entered){
+      const txt=sectionObservations[e.target.id];
+      if(txt) setTimeout(()=>showObservation(txt),2000);
+    }
+  });
+},{threshold:0.4});
+Object.keys(sectionObservations).forEach(id=>{
+  const el=document.getElementById(id);
+  if(el) sectionObs.observe(el);
+});
+</script>
+</body>
+</html>
